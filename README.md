@@ -352,6 +352,7 @@
         import { getDatabase, ref, set, get, update, onValue } from "https://unpkg.com/firebase@10.8.0/firebase-database.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://unpkg.com/firebase@10.8.0/firebase-auth.js";
 
+        // Your Exact Firebase Configuration Matrix
         const firebaseConfig = {
             apiKey: "AIzaSyBqtvNJW_HNv4H2EAzeAhNL-tiUjX1huEg",
             authDomain: "trade51-f64d5.firebaseapp.com",
@@ -374,7 +375,7 @@
             { id: "p_a3", name: "Pod Alpha-3", cost: 600, dailyYield: 45, days: 30, img: "https://images.unsplash.com/photo-1563770660941-20978e870e26?w=400&q=80", cat: "normal" },
             { id: "r_s1", name: "Rig Stratum-1 [PROMO]", cost: 3000, dailyYield: 300, days: 10, img: "https://images.unsplash.com/photo-1640340434855-6084b1f4901c?w=400&q=80", cat: "special" },
             { id: "r_s2", name: "Rig Stratum-2 [PROMO]", cost: 4000, dailyYield: 360, days: 12, img: "https://images.unsplash.com/photo-1624996379697-f01d168b1a52?w=400&q=80", cat: "special" },
-            { id: "r_s3", name: "Rig Stratum-3 [PROMO]", cost: 5000, dailyYield: 420, days: 15, img: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d + ?w=400&q=80", cat: "special" },
+            { id: "r_s3", name: "Rig Stratum-3 [PROMO]", cost: 5000, dailyYield: 420, days: 15, img: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=400&q=80", cat: "special" },
             { id: "m_qc", name: "Matrix Quantum-Core", cost: 100000, dailyYield: 8500, days: 45, img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400&q=80", cat: "exclusive" }
         ];
 
@@ -391,6 +392,7 @@
             }
         });
 
+        // 2. Sync Wallet Matrix dynamically based on active Auth Session
         function listenToUserWallet(uid) {
             const walletRef = ref(database, 'users/' + uid);
             onValue(walletRef, (snapshot) => {
@@ -443,7 +445,7 @@
                 balance: currentBal - cost,
                 leasedCount: (window.currentUserWallet?.leasedCount || 0) + 1,
                 referralEarnings: (window.currentUserWallet?.referralEarnings || 0) + (cost * 0.10)
-            }).then(() => alert("Node engine deployed successfully!"));
+            })            .then(() => alert("Node engine deployed successfully!"));
         };
 
         window.logoutUser = function() {
