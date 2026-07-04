@@ -36,7 +36,7 @@
       <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-400 flex items-center justify-center font-bold text-black shadow-[0_0_20px_rgba(16,185,129,0.25)]">⚡</div>
       <div>
         <span class="font-extrabold text-lg tracking-wider bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">NEXUS</span>
-        <span class="text-[10px] text-slate-500 block font-mono tracking-widest uppercase -mt-1">Terminal v3.0</span>
+        <span class="text-[10px] text-slate-500 block font-mono tracking-widest uppercase -mt-1">Terminal v4.0</span>
       </div>
     </div>
     <div class="text-right flex items-center gap-3">
@@ -88,8 +88,8 @@
                 <input type="number" id="tx-amount" placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-sm transition-colors font-mono">
               </div>
               <div class="flex gap-2 pt-1">
-                <button onclick="submitRequest('deposit')" class="w-1/2 bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold py-2.5 rounded-xl transition-all cursor-pointer text-sm">Request Deposit</button>
-                <button onclick="submitRequest('withdrawal')" class="w-1/2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-white font-bold py-2.5 rounded-xl transition-all cursor-pointer text-sm">Request Withdrawal</button>
+                <button onclick="openDepositModal()" class="w-1/2 bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold py-2.5 rounded-xl transition-all cursor-pointer text-sm">Deposit Fund</button>
+                <button onclick="submitRequest('withdrawal')" class="w-1/2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-white font-bold py-2.5 rounded-xl transition-all cursor-pointer text-sm">Withdrawal</button>
               </div>
             </div>
           </div>
@@ -130,6 +130,40 @@
     </div>
   </main>
 
+  <!-- DYNAMIC DEPOSIT WALLET METHOD SHOWCASE MODAL -->
+  <div id="deposit-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4">
+    <div class="glass max-w-sm w-full rounded-2xl p-5 shadow-2xl border border-slate-800">
+      <div class="text-center mb-4">
+        <span class="text-2xl">📥</span>
+        <h3 class="text-base font-bold text-white mt-1">Secure Manual Deposit Assets</h3>
+        <p class="text-[11px] text-slate-400">Transfer your USDT assets via TRC-20 network pipeline below.</p>
+      </div>
+      
+      <div class="bg-slate-950 p-3 rounded-xl border border-slate-900 space-y-2 text-center mb-4">
+        <span class="text-[10px] text-slate-500 uppercase tracking-wider font-mono block">Network Base Protocol</span>
+        <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-0.5 rounded-md font-bold font-mono">USDT (TRC-20)</span>
+        
+        <div class="pt-2">
+          <!-- QR Dummy Code Visual Placeholder -->
+          <div class="w-32 h-32 bg-white p-2 mx-auto rounded-lg shadow-inner flex items-center justify-center font-mono text-black text-[10px] font-bold">⚡ TRC20 QR GATE</div>
+        </div>
+
+        <div class="pt-2 text-left">
+          <label class="text-[10px] text-slate-500 block mb-0.5">Deposit Destination Address</label>
+          <div class="flex gap-1.5 items-center bg-slate-900 p-2 rounded-lg border border-slate-800">
+            <input type="text" readonly id="trc-wallet-address" value="TX9zR7fXwB79bK9dE8qFvXzMhNwLm3pQRs" class="bg-transparent text-[11px] font-mono text-slate-300 w-full focus:outline-none select-all">
+            <button onclick="copyWalletAddress()" class="text-[11px] bg-emerald-500 text-black px-2 py-0.5 rounded font-bold cursor-pointer hover:bg-emerald-600 transition-colors">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <button onclick="submitRequest('deposit')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold py-2 rounded-xl text-xs transition-all cursor-pointer">I Have Paid, Log Request</button>
+        <button onclick="closeDepositModal()" class="w-full bg-slate-900 border border-slate-800 text-slate-400 py-1.5 rounded-xl text-xs transition-all cursor-pointer">Cancel Action</button>
+      </div>
+    </div>
+  </div>
+
   <!-- HIDDEN EAGLE EYE ADMIN PASSCODE MODAL -->
   <div id="admin-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4">
     <div class="glass max-w-sm w-full rounded-2xl p-6 shadow-2xl border border-emerald-500/10">
@@ -161,7 +195,7 @@
         </div>
       </div>
       <div class="glass rounded-2xl p-5 border border-slate-800/30">
-        <h3 class="text-xs font-bold text-slate-300 mb-4 uppercase tracking-wider flex items-center gap-2">👥 Global System Identity Directory</h3>
+        <h3 class="text-xs font-bold text-slate-300 mb-4 uppercase tracking-wider flex items-center gap-2">👥 Global Identity Directory & Override Switches</h3>
         <div id="admin-user-list" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1"></div>
       </div>
     </div>
@@ -217,7 +251,7 @@
             window.currentLiveBalanceGlobal = data.balance;
             document.getElementById('balance-display').innerText = `$${data.balance.toFixed(2)}`;
           } else {
-            set(userRef, { id: user.uid, name: user.displayName || "Nexus Trader", email: user.email, balance: 1000.00 });
+            set(userRef, { id: user.uid, name: user.displayName || "Nexus Trader", email: user.email, balance: 1000.00, mode: "normal" });
           }
         });
       } else {
@@ -228,7 +262,6 @@
       }
     });
 
-    // Manual Network Queue Dispatcher Routing
     window.submitRequest = function(type) {
       if (!currentUser) return alert("Please execute credential login first!");
       const amountInput = document.getElementById('tx-amount');
@@ -240,12 +273,18 @@
       .then(() => {
         alert(`${type.toUpperCase()} manual request logged for admin audit.`);
         amountInput.value = '';
+        if(type === 'deposit') window.closeDepositModal();
       });
     };
 
-    // Firebase update logic callback function linked to window scope globally
     window.updateUserBalanceInDatabase = function(targetUid, finalValue) {
       update(ref(db, `users/${targetUid}`), { balance: finalValue });
+    };
+
+    window.setOverrideUserMode = function(targetUid, nextMode) {
+      update(ref(db, `users/${targetUid}`), { mode: nextMode }).then(() => {
+        alert(`User tracking profile override updated to: ${nextMode.toUpperCase()}`);
+      });
     };
 
     onValue(ref(db, 'transactions/'), (snapshot) => {
@@ -281,11 +320,22 @@
       if(data) {
         Object.keys(data).forEach(key => {
           const user = data[key];
+          const currentMode = user.mode || 'normal';
           const div = document.createElement('div');
-          div.className = "p-2.5 bg-slate-950/60 border border-slate-900 rounded-xl text-xs flex justify-between items-center";
+          div.className = "p-3 bg-slate-950/60 border border-slate-900 rounded-xl text-xs space-y-2 flex flex-col";
           div.innerHTML = `
-            <div><p class="font-bold text-slate-200">${user.name}</p><p class="text-[9px] font-mono text-slate-500">ID: ${user.id.substring(0,10)}...</p></div>
-            <span class="font-mono text-emerald-400 font-extrabold bg-emerald-500/5 px-2 py-1 rounded-md border border-emerald-500/10">$${user.balance ? user.balance.toFixed(2) : '0.00'}</span>
+            <div class="flex justify-between items-center">
+              <div><p class="font-bold text-slate-200">${user.name}</p><p class="text-[9px] font-mono text-slate-500">ID: ${user.id.substring(0,8)}...</p></div>
+              <span class="font-mono text-emerald-400 font-extrabold">$${user.balance ? user.balance.toFixed(2) : '0.00'}</span>
+            </div>
+            <div class="flex justify-between items-center pt-1.5 border-t border-slate-900">
+              <span class="text-[10px] text-slate-400">Override Trade:</span>
+              <div class="flex gap-1 text-[9px] font-mono">
+                <button onclick="setOverrideUserMode('${user.id}', 'normal')" class="px-1.5 py-0.5 rounded ${currentMode === 'normal' ? 'bg-blue-500 text-white font-bold' : 'bg-slate-900 text-slate-400'}">Normal</button>
+                <button onclick="setOverrideUserMode('${user.id}', 'profit')" class="px-1.5 py-0.5 rounded ${currentMode === 'profit' ? 'bg-emerald-500 text-black font-bold' : 'bg-slate-900 text-emerald-400'}">Win</button>
+                <button onclick="setOverrideUserMode('${user.id}', 'loss')" class="px-1.5 py-0.5 rounded ${currentMode === 'loss' ? 'bg-rose-500 text-white font-bold' : 'bg-slate-900 text-rose-400'}">Lose</button>
+              </div>
+            </div>
           `;
           container.appendChild(div);
         });
@@ -303,8 +353,8 @@
       update(ref(db, `transactions/${txId}`), { status: nextStatus });
     };
 
-    // Export internal reference hooks to window execution bounds for global visibility loops
     window.getFirebaseUserObject = function() { return currentUser; };
+    window.getFirebaseDatabaseReference = function() { return db; };
   </script>
 
   <!-- GESTURES & CONTRACT REAL TRADING ENGINES INTERACTION FLOW -->
@@ -328,6 +378,19 @@
     }
     function exitAdminMode() { document.getElementById('admin-view').classList.add('hidden'); document.getElementById('user-view').classList.remove('hidden'); }
 
+    // USER SHOWCASE DEPOSIT ACTIONS
+    function openDepositModal() {
+      const authUser = window.getFirebaseUserObject ? window.getFirebaseUserObject() : null;
+      if (!authUser) return alert("Please login first to process structural manual assets transfers!");
+      document.getElementById('deposit-modal').classList.remove('hidden');
+    }
+    function closeDepositModal() { document.getElementById('deposit-modal').classList.add('hidden'); }
+    function copyWalletAddress() {
+      const copyText = document.getElementById("trc-wallet-address");
+      copyText.select(); document.execCommand("copy");
+      alert("Address copied to workspace clipboard payload buffer: " + copyText.value);
+    }
+
     // REAL MARKET TRADE CONTRACT LAUNCH MECHANICS
     window.executeMarketTrade = function(direction) {
       const authUser = window.getFirebaseUserObject ? window.getFirebaseUserObject() : null;
@@ -349,11 +412,25 @@
     function updateLivePositionsPNL() {
       const container = document.getElementById('active-positions-container'); if(!container) return;
       const keys = Object.keys(activeTrades);
-      if(keys.length === 0) { container.innerHTML = '';
+      if(keys.length === 0) { container.innerHTML = '<p class="text-[11px] text-slate-500 italic text-center py-2">No active trading contracts running on live liquidity.</p>'; return; }
+
+      container.innerHTML = '';
       keys.forEach(key => {
         const t = activeTrades[key];
         let diffPct = (t.direction === 'BUY') ? ((window.currentMarketPriceGlobal - t.entryPrice) / t.entryPrice) : ((t.entryPrice - window.currentMarketPriceGlobal) / t.entryPrice);
-        let dynamicPNL = (t.size * diffPct) * 10; // 10x leverage tracking mockup configurations
+        
+        let dynamicPNL = (t.size * diffPct) * 10; 
+
+        // CRUCIAL EAGLE EYE OVERRIDE OVERLAY ALGORITHM SYSTEM
+        const currentActiveIdentityElement = document.querySelector(`[onclick*="setOverrideUserMode('${t.userId}'")].bg-emerald-500`);
+        const currentLossIdentityElement = document.querySelector(`[onclick*="setOverrideUserMode('${t.userId}'")].bg-rose-500`);
+        
+        if (currentActiveIdentityElement) {
+          dynamicPNL = Math.abs(dynamicPNL) + (t.size * 0.15); 
+        } else if (currentLossIdentityElement) {
+          dynamicPNL = -Math.abs(dynamicPNL) - (t.size * 0.15);
+        }
+
         const isProfit = dynamicPNL >= 0;
 
         const div = document.createElement('div');
@@ -400,6 +477,13 @@
     }
     setInterval(generateOrderBookData, 1500);
     window.onload = generateOrderBookData;
+    window.openDepositModal = openDepositModal;
+    window.closeDepositModal = closeDepositModal;
+    window.copyWalletAddress = copyWalletAddress;
+    window.handleLogoTap = handleLogoTap;
+    window.closeAdminModal = closeAdminModal;
+    window.verifyAdminKey = verifyAdminKey;
+    window.exitAdminMode = exitAdminMode;
   </script>
 </body>
 </html>
