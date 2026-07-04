@@ -1,489 +1,323 @@
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexus Premium Trading Terminal</title>
-  <!-- Tailwind CSS CDN for modern styling -->
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <style>
-    body {
-      background-color: #06090e;
-      color: #e2e8f0;
-      font-family: system-ui, -apple-system, sans-serif;
-    }
-    .glass {
-      background: rgba(13, 20, 35, 0.75);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.03);
-    }
-    ::-webkit-scrollbar {
-      width: 4px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.1);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.1);
-      border-radius: 2px;
-    }
-  </style>
-</head>
-<body class="min-h-screen p-3 md:p-6 flex flex-col items-center">
-
-  <!-- TOP HEADER PANEL WITH SECRET TAP TARGET LOGO -->
-  <header class="w-full max-w-6xl flex justify-between items-center mb-4 p-4 glass rounded-2xl border border-slate-800/40">
-    <div id="app-logo" onclick="handleLogoTap()" class="flex items-center gap-2.5 cursor-pointer select-none active:scale-95 transition-transform">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-400 flex items-center justify-center font-bold text-black shadow-[0_0_20px_rgba(16,185,129,0.25)]">⚡</div>
-      <div>
-        <span class="font-extrabold text-lg tracking-wider bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">NEXUS</span>
-        <span class="text-[10px] text-slate-500 block font-mono tracking-widest uppercase -mt-1">Terminal v4.0</span>
-      </div>
-    </div>
-    <div class="text-right flex items-center gap-3">
-      <div class="hidden sm:block">
-        <span class="text-[10px] text-slate-500 block uppercase tracking-wider">Account Status</span>
-        <span class="text-sm font-semibold text-emerald-400" id="user-display-name">Loading System...</span>
-      </div>
-      <div id="user-display-mobile" class="sm:hidden text-sm font-semibold text-emerald-400">Loading...</div>
-    </div>
-  </header>
-
-  <!-- MAIN OPERATIONAL VIEW PLATFORM -->
-  <main id="user-view" class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-4 gap-4">
-    
-    <!-- LEFT COLUMN: REAL-TIME INTERACTIVE CHART PLUGINS -->
-    <div class="lg:col-span-3 flex flex-col gap-4">
-      <div class="glass rounded-2xl p-4 flex flex-col justify-between min-h-[420px] relative overflow-hidden">
-        <div class="flex justify-between items-start mb-3 z-10">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-lg text-white">BTC / USDT</span>
-              <span class="text-xs font-mono bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded">LIVE</span>
-            </div>
-            <h2 class="text-2xl font-black text-emerald-400 mt-1" id="live-crypto-price">$94,250.00</h2>
-          </div>
-          <div class="text-right text-xs font-mono text-slate-400">
-            <div>24h High: <span class="text-white">$95,110</span></div>
-            <div>24h Low: <span class="text-white">$92,400</span></div>
-          </div>
-        </div>
-
-        <!-- TradingView Embedded Widget -->
-        <div class="w-full h-[320px] rounded-xl overflow-hidden border border-slate-800/60">
-          <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_chart&symbol=BINANCE%3ABTCUSDT&interval=5&hidesidetoolbar=1&symboledit=0&saveimage=1&toolbarbg=0b0e14&studies=%5B%5D&theme=dark&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en" class="w-full h-full border-0"></iframe>
-        </div>
-      </div>
-
-      <!-- BOTTOM ROW: WALLET ACTIONS & REAL LIVE POSITION TRACKER -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Manual Actions Form -->
-        <div class="glass rounded-2xl p-5 flex flex-col justify-between">
-          <div>
-            <span class="text-xs text-slate-400 uppercase tracking-widest block mb-1">Available Account Portfolio Balance</span>
-            <h3 class="text-3xl font-black text-white tracking-tight mb-4" id="balance-display">$0.00</h3>
-            
-            <div class="space-y-2.5">
-              <div>
-                <label class="text-[11px] text-slate-400 block mb-1 font-medium">Execution Amount (USDT)</label>
-                <input type="number" id="tx-amount" placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-sm transition-colors font-mono">
-              </div>
-              <div class="flex gap-2 pt-1">
-                <button onclick="openDepositModal()" class="w-1/2 bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold py-2.5 rounded-xl transition-all cursor-pointer text-sm">Deposit Fund</button>
-                <button onclick="submitRequest('withdrawal')" class="w-1/2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-white font-bold py-2.5 rounded-xl transition-all cursor-pointer text-sm">Withdrawal</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- REAL CONTRACT TRADING SIMULATION CONTROLLER -->
-        <div class="glass rounded-2xl p-5 flex flex-col justify-between">
-          <div>
-            <span class="text-xs text-slate-400 uppercase tracking-widest block mb-2">Live Execution Panel (Real Market Execution)</span>
-            
-            <div class="flex gap-2 mb-3">
-              <button onclick="executeMarketTrade('BUY')" class="w-1/2 bg-emerald-500 hover:bg-emerald-600 text-black font-black py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-pointer transition-transform active:scale-95">Buy / Long</button>
-              <button onclick="executeMarketTrade('SELL')" class="w-1/2 bg-rose-500 hover:bg-rose-600 text-white font-black py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-pointer transition-transform active:scale-95">Sell / Short</button>
-            </div>
-
-            <div class="border border-slate-800/80 rounded-xl p-3 bg-slate-950/40">
-              <span class="text-[10px] text-slate-500 uppercase tracking-wider block mb-2">Active Market Positions</span>
-              <div id="active-positions-container" class="space-y-2 max-h-[110px] overflow-y-auto">
-                <p class="text-[11px] text-slate-500 italic text-center py-2">No active trading contracts running on live liquidity.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT COLUMN: ORDER BOOK -->
-    <div class="glass rounded-2xl p-4 flex flex-col h-full min-h-[500px]">
-      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800/60">📊 Real-time Liquidity Order Book</h3>
-      <div class="grid grid-cols-2 text-[10px] text-slate-500 font-mono mb-2 px-1">
-        <div>PRICE (USDT)</div>
-        <div class="text-right">SIZE (BTC)</div>
-      </div>
-      
-      <div id="orderbook-asks" class="flex flex-col-reverse gap-1 text-rose-400 font-mono text-xs mb-3"></div>
-      <div class="bg-slate-900/60 p-2 rounded-lg text-center font-bold text-sm my-2 border border-slate-800/40 text-white font-mono" id="center-spread-price">$94,250.00</div>
-      <div id="orderbook-bids" class="flex flex-col gap-1 text-emerald-400 font-mono text-xs"></div>
-    </div>
-  </main>
-
-  <!-- DYNAMIC DEPOSIT WALLET METHOD SHOWCASE MODAL -->
-  <div id="deposit-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4">
-    <div class="glass max-w-sm w-full rounded-2xl p-5 shadow-2xl border border-slate-800">
-      <div class="text-center mb-4">
-        <span class="text-2xl">📥</span>
-        <h3 class="text-base font-bold text-white mt-1">Secure Manual Deposit Assets</h3>
-        <p class="text-[11px] text-slate-400">Transfer your USDT assets via TRC-20 network pipeline below.</p>
-      </div>
-      
-      <div class="bg-slate-950 p-3 rounded-xl border border-slate-900 space-y-2 text-center mb-4">
-        <span class="text-[10px] text-slate-500 uppercase tracking-wider font-mono block">Network Base Protocol</span>
-        <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-0.5 rounded-md font-bold font-mono">USDT (TRC-20)</span>
-        
-        <div class="pt-2">
-          <!-- QR Dummy Code Visual Placeholder -->
-          <div class="w-32 h-32 bg-white p-2 mx-auto rounded-lg shadow-inner flex items-center justify-center font-mono text-black text-[10px] font-bold">⚡ TRC20 QR GATE</div>
-        </div>
-
-        <div class="pt-2 text-left">
-          <label class="text-[10px] text-slate-500 block mb-0.5">Deposit Destination Address</label>
-          <div class="flex gap-1.5 items-center bg-slate-900 p-2 rounded-lg border border-slate-800">
-            <input type="text" readonly id="trc-wallet-address" value="TX9zR7fXwB79bK9dE8qFvXzMhNwLm3pQRs" class="bg-transparent text-[11px] font-mono text-slate-300 w-full focus:outline-none select-all">
-            <button onclick="copyWalletAddress()" class="text-[11px] bg-emerald-500 text-black px-2 py-0.5 rounded font-bold cursor-pointer hover:bg-emerald-600 transition-colors">Copy</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="space-y-2">
-        <button onclick="submitRequest('deposit')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold py-2 rounded-xl text-xs transition-all cursor-pointer">I Have Paid, Log Request</button>
-        <button onclick="closeDepositModal()" class="w-full bg-slate-900 border border-slate-800 text-slate-400 py-1.5 rounded-xl text-xs transition-all cursor-pointer">Cancel Action</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- HIDDEN EAGLE EYE ADMIN PASSCODE MODAL -->
-  <div id="admin-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4">
-    <div class="glass max-w-sm w-full rounded-2xl p-6 shadow-2xl border border-emerald-500/10">
-      <h3 class="text-base font-bold text-emerald-400 mb-1 flex items-center gap-2">👁️ Eagle Eye Terminal Override</h3>
-      <p class="text-xs text-slate-400 mb-4">Enter system passcode for absolute manual control over accounts ledger database endpoints.</p>
-      <input type="password" id="admin-key-input" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white mb-4 focus:outline-none focus:border-emerald-500 text-center tracking-widest font-mono text-lg">
-      <div class="flex gap-2">
-        <button onclick="closeAdminModal()" class="w-1/2 bg-slate-900 text-slate-400 py-2.5 rounded-xl text-xs font-bold border border-slate-800">Cancel</button>
-        <button onclick="verifyAdminKey()" class="w-1/2 bg-emerald-500 text-black font-black py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/10">Verify Admin</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- FULL BACKEND OVERVIEW ADMIN MANAGEMENT VIEWPORT -->
-  <div id="admin-view" class="hidden w-full max-w-6xl flex flex-col gap-4">
-    <div class="w-full glass rounded-2xl p-4 flex justify-between items-center border border-red-500/20 shadow-xl">
-      <div>
-        <span class="inline-block bg-red-500/10 text-red-400 text-[9px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-md mb-0.5">Operator Command Privileges</span>
-        <h2 class="text-lg font-black text-white">Eagle Eye Core Console</h2>
-      </div>
-      <button onclick="exitAdminMode()" class="bg-slate-900 border border-slate-800 hover:bg-slate-800 text-xs px-3 py-2 rounded-xl text-slate-300 font-bold transition-colors cursor-pointer">Close Operator Shield</button>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <div class="lg:col-span-2 glass rounded-2xl p-5 border border-slate-800/30">
-        <h3 class="text-xs font-bold text-slate-300 mb-4 uppercase tracking-wider flex items-center gap-2">⏳ Manual Deposit / Withdrawal Queue</h3>
-        <div id="admin-queue-list" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
-          <p class="text-xs text-slate-500 italic text-center py-4">No transactions awaiting approval updates profiles.</p>
-        </div>
-      </div>
-      <div class="glass rounded-2xl p-5 border border-slate-800/30">
-        <h3 class="text-xs font-bold text-slate-300 mb-4 uppercase tracking-wider flex items-center gap-2">👥 Global Identity Directory & Override Switches</h3>
-        <div id="admin-user-list" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SCRIPTS ENGINE LOGIC ROUTERS -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBqtvNJW_HNv4H2EAzeAhNL-tiUjX1huEg",
-      authDomain: "trade51-f64d5.firebaseapp.com",
-      databaseURL: "https://trade51-f64d5-default-rtdb.firebaseio.com",
-      projectId: "trade51-f64d5",
-      storageBucket: "trade51-f64d5.firebasestorage.app",
-      messagingSenderId: "38759095579",
-      appId: "1:38759095579:web:013d72ab4b5183f99347be"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
-    const googleProvider = new GoogleAuthProvider();
-
-    let currentUser = null;
-    let balanceListener = null;
-    window.currentLiveBalanceGlobal = 0.00;
-
-    window.loginWithGoogle = function() {
-      signInWithPopup(auth, googleProvider).catch((e) => alert("Login failed: " + e.message));
-    };
-
-    window.logoutUser = function() {
-      signOut(auth).then(() => alert("Session closed."));
-    };
-
-    onAuthStateChanged(auth, (user) => {
-      const dDesk = document.getElementById('user-display-name');
-      const dMob = document.getElementById('user-display-mobile');
-      if (user) {
-        currentUser = user;
-        const profileStr = `${user.displayName || user.email} <button onclick="logoutUser()" class="text-[10px] text-rose-400 font-bold underline ml-1.5 cursor-pointer">Logout</button>`;
-        dDesk.innerHTML = profileStr; dMob.innerHTML = profileStr;
-        
-        const userRef = ref(db, `users/${user.uid}`);
-        if (balanceListener) balanceListener();
-        
-        balanceListener = onValue(userRef, (snapshot) => {
-          const data = snapshot.val();
-          if (data) {
-            window.currentLiveBalanceGlobal = data.balance;
-            document.getElementById('balance-display').innerText = `$${data.balance.toFixed(2)}`;
-          } else {
-            set(userRef, { id: user.uid, name: user.displayName || "Nexus Trader", email: user.email, balance: 1000.00, mode: "normal" });
-          }
-        });
-      } else {
-        currentUser = null;
-        document.getElementById('balance-display').innerText = "$0.00";
-        const loginBtn = `<button onclick="loginWithGoogle()" class="bg-gradient-to-r from-emerald-500 to-cyan-500 text-black font-extrabold text-[11px] px-3 py-1.5 rounded-xl cursor-pointer">Login Identity</button>`;
-        dDesk.innerHTML = loginBtn; dMob.innerHTML = loginBtn;
-      }
-    });
-
-    window.submitRequest = function(type) {
-      if (!currentUser) return alert("Please execute credential login first!");
-      const amountInput = document.getElementById('tx-amount');
-      const amount = parseFloat(amountInput.value);
-      if (!amount || amount <= 0) return alert("Invalid amount provided!");
-
-      const newTxRef = push(ref(db, 'transactions/'));
-      set(newTxRef, { txId: newTxRef.key, userId: currentUser.uid, userName: currentUser.displayName || currentUser.email, type: type, amount: amount, status: "pending" })
-      .then(() => {
-        alert(`${type.toUpperCase()} manual request logged for admin audit.`);
-        amountInput.value = '';
-        if(type === 'deposit') window.closeDepositModal();
-      });
-    };
-
-    window.updateUserBalanceInDatabase = function(targetUid, finalValue) {
-      update(ref(db, `users/${targetUid}`), { balance: finalValue });
-    };
-
-    window.setOverrideUserMode = function(targetUid, nextMode) {
-      update(ref(db, `users/${targetUid}`), { mode: nextMode }).then(() => {
-        alert(`User tracking profile override updated to: ${nextMode.toUpperCase()}`);
-      });
-    };
-
-    onValue(ref(db, 'transactions/'), (snapshot) => {
-      const container = document.getElementById('admin-queue-list'); container.innerHTML = '';
-      const data = snapshot.val(); let count = 0;
-      if (data) {
-        Object.keys(data).forEach(key => {
-          const tx = data[key];
-          if(tx.status === 'pending') {
-            count++;
-            const card = document.createElement('div');
-            card.className = "p-3 bg-slate-950 rounded-xl border border-slate-900 flex justify-between items-center text-xs";
-            card.innerHTML = `
-              <div>
-                <div class="font-bold text-white">${tx.userName}</div>
-                <div class="text-[10px] ${tx.type === 'deposit' ? 'text-emerald-400' : 'text-rose-400'} uppercase font-extrabold font-mono">${tx.type} • $${tx.amount.toFixed(2)}</div>
-              </div>
-              <div class="flex gap-1.5">
-                <button onclick="processTx('${tx.txId}', '${tx.userId}', '${tx.type}', ${tx.amount}, 'approved')" class="bg-emerald-500 text-black font-black text-[11px] px-3 py-1 rounded-lg cursor-pointer">Approve</button>
-                <button onclick="processTx('${tx.txId}', '${tx.userId}', '${tx.type}', ${tx.amount}, 'rejected')" class="bg-slate-900 border border-slate-800 text-rose-400 font-bold text-[11px] px-3 py-1 rounded-lg cursor-pointer">Reject</button>
-              </div>
-            `;
-            container.appendChild(card);
-          }
-        });
-      }
-      if(count === 0) container.innerHTML = '<p class="text-xs text-slate-500 italic text-center py-4">No transactions awaiting manual action profiles.</p>';
-    });
-
-    onValue(ref(db, 'users/'), (snapshot) => {
-      const container = document.getElementById('admin-user-list'); container.innerHTML = '';
-      const data = snapshot.val();
-      if(data) {
-        Object.keys(data).forEach(key => {
-          const user = data[key];
-          const currentMode = user.mode || 'normal';
-          const div = document.createElement('div');
-          div.className = "p-3 bg-slate-950/60 border border-slate-900 rounded-xl text-xs space-y-2 flex flex-col";
-          div.innerHTML = `
-            <div class="flex justify-between items-center">
-              <div><p class="font-bold text-slate-200">${user.name}</p><p class="text-[9px] font-mono text-slate-500">ID: ${user.id.substring(0,8)}...</p></div>
-              <span class="font-mono text-emerald-400 font-extrabold">$${user.balance ? user.balance.toFixed(2) : '0.00'}</span>
-            </div>
-            <div class="flex justify-between items-center pt-1.5 border-t border-slate-900">
-              <span class="text-[10px] text-slate-400">Override Trade:</span>
-              <div class="flex gap-1 text-[9px] font-mono">
-                <button onclick="setOverrideUserMode('${user.id}', 'normal')" class="px-1.5 py-0.5 rounded ${currentMode === 'normal' ? 'bg-blue-500 text-white font-bold' : 'bg-slate-900 text-slate-400'}">Normal</button>
-                <button onclick="setOverrideUserMode('${user.id}', 'profit')" class="px-1.5 py-0.5 rounded ${currentMode === 'profit' ? 'bg-emerald-500 text-black font-bold' : 'bg-slate-900 text-emerald-400'}">Win</button>
-                <button onclick="setOverrideUserMode('${user.id}', 'loss')" class="px-1.5 py-0.5 rounded ${currentMode === 'loss' ? 'bg-rose-500 text-white font-bold' : 'bg-slate-900 text-rose-400'}">Lose</button>
-              </div>
-            </div>
-          `;
-          container.appendChild(div);
-        });
-      }
-    });
-
-    window.processTx = function(txId, userId, type, amount, nextStatus) {
-      if(nextStatus === 'approved') {
-        onValue(ref(db, `users/${userId}/balance`), (snap) => {
-          let currentBal = snap.val() || 0;
-          let updatedBal = (type === 'deposit') ? (currentBal + amount) : (currentBal - amount);
-          window.updateUserBalanceInDatabase(userId, updatedBal);
-        }, { onlyOnce: true });
-      }
-      update(ref(db, `transactions/${txId}`), { status: nextStatus });
-    };
-
-    window.getFirebaseUserObject = function() { return currentUser; };
-    window.getFirebaseDatabaseReference = function() { return db; };
-  </script>
-
-  <!-- GESTURES & CONTRACT REAL TRADING ENGINES INTERACTION FLOW -->
-  <script>
-    let tapCount = 0, lastTap = 0;
-    const MASTER_KEY = "admin123"; 
-    window.currentMarketPriceGlobal = 94250.00;
-    let activeTrades = {};
-
-    function handleLogoTap() {
-      const now = new Date().getTime();
-      if (now - lastTap > 1500) tapCount = 0;
-      tapCount++; lastTap = now;
-      if (tapCount === 5) { tapCount = 0; document.getElementById('admin-modal').classList.remove('hidden'); }
-    }
-    function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); document.getElementById('admin-key-input').value = ''; }
-    function verifyAdminKey() {
-      if (document.getElementById('admin-key-input').value === MASTER_KEY) {
-        closeAdminModal(); document.getElementById('user-view').classList.add('hidden'); document.getElementById('admin-view').classList.remove('hidden');
-      } else { alert("Access denied!"); closeAdminModal(); }
-    }
-    function exitAdminMode() { document.getElementById('admin-view').classList.add('hidden'); document.getElementById('user-view').classList.remove('hidden'); }
-
-    // USER SHOWCASE DEPOSIT ACTIONS
-    function openDepositModal() {
-      const authUser = window.getFirebaseUserObject ? window.getFirebaseUserObject() : null;
-      if (!authUser) return alert("Please login first to process structural manual assets transfers!");
-      document.getElementById('deposit-modal').classList.remove('hidden');
-    }
-    function closeDepositModal() { document.getElementById('deposit-modal').classList.add('hidden'); }
-    function copyWalletAddress() {
-      const copyText = document.getElementById("trc-wallet-address");
-      copyText.select(); document.execCommand("copy");
-      alert("Address copied to workspace clipboard payload buffer: " + copyText.value);
-    }
-
-    // REAL MARKET TRADE CONTRACT LAUNCH MECHANICS
-    window.executeMarketTrade = function(direction) {
-      const authUser = window.getFirebaseUserObject ? window.getFirebaseUserObject() : null;
-      if (!authUser) return alert("Please login to initiate real-time contracts execution!");
-
-      const amountInput = document.getElementById('tx-amount');
-      const sizeValue = parseFloat(amountInput.value);
-      if (!sizeValue || sizeValue <= 0) return alert("Input a valid order size amount!");
-      if (sizeValue > window.currentLiveBalanceGlobal) return alert("Insufficient available portfolio margin bounds!");
-
-      const positionId = "pos_" + Math.random().toString(36).substring(2, 9);
-      activeTrades[positionId] = { id: positionId, direction: direction, entryPrice: window.currentMarketPriceGlobal, size: sizeValue, userId: authUser.uid };
-
-      alert(`Market Contract Executed! ${direction} order filled at: $${window.currentMarketPriceGlobal.toFixed(2)}`);
-      amountInput.value = '';
-      updateLivePositionsPNL();
-    };
-
-    function updateLivePositionsPNL() {
-      const container = document.getElementById('active-positions-container'); if(!container) return;
-      const keys = Object.keys(activeTrades);
-      if(keys.length === 0) { container.innerHTML = '<p class="text-[11px] text-slate-500 italic text-center py-2">No active trading contracts running on live liquidity.</p>'; return; }
-
-      container.innerHTML = '';
-      keys.forEach(key => {
-        const t = activeTrades[key];
-        let diffPct = (t.direction === 'BUY') ? ((window.currentMarketPriceGlobal - t.entryPrice) / t.entryPrice) : ((t.entryPrice - window.currentMarketPriceGlobal) / t.entryPrice);
-        
-        let dynamicPNL = (t.size * diffPct) * 10; 
-
-        // CRUCIAL EAGLE EYE OVERRIDE OVERLAY ALGORITHM SYSTEM
-        const currentActiveIdentityElement = document.querySelector(`[onclick*="setOverrideUserMode('${t.userId}'")].bg-emerald-500`);
-        const currentLossIdentityElement = document.querySelector(`[onclick*="setOverrideUserMode('${t.userId}'")].bg-rose-500`);
-        
-        if (currentActiveIdentityElement) {
-          dynamicPNL = Math.abs(dynamicPNL) + (t.size * 0.15); 
-        } else if (currentLossIdentityElement) {
-          dynamicPNL = -Math.abs(dynamicPNL) - (t.size * 0.15);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pak Trade Global LLC - Node Cloud Network</title>
+    <style>
+        /* Base Architecture Setup */
+        body {
+            background-color: #0b0f19;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
         }
 
-        const isProfit = dynamicPNL >= 0;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-        const div = document.createElement('div');
-        div.className = "p-2 bg-slate-950 rounded-lg flex justify-between items-center text-[11px] border border-slate-800/60";
-        div.innerHTML = `
-          <div><span class="font-bold ${t.direction === 'BUY' ? 'text-emerald-400' : 'text-rose-400'}">${t.direction}</span> <span class="text-slate-400 font-mono">@$${t.entryPrice.toFixed(1)}</span></div>
-          <div class="flex items-center gap-2 font-mono">
-            <span class="${isProfit ? 'text-emerald-400' : 'text-rose-400'} font-bold">${isProfit ? '+' : ''}$${dynamicPNL.toFixed(2)}</span>
-            <button onclick="closeActivePosition('${t.id}', ${dynamicPNL}, '${t.userId}', ${t.size})" class="bg-slate-900 border border-slate-800 text-slate-400 hover:text-white px-1.5 py-0.5 rounded text-[10px] cursor-pointer">Close</button>
-          </div>
-        `;
-        container.appendChild(div);
-      });
-    }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
 
-    window.closeActivePosition = function(id, finalPnl, userId, originalSize) {
-      delete activeTrades[id];
-      let newCalculatedBalance = window.currentLiveBalanceGlobal + finalPnl;
-      if (window.updateUserBalanceInDatabase) {
-        window.updateUserBalanceInDatabase(userId, newCalculatedBalance);
-      }
-      alert(`Position closed! Contract results yields settled: $${finalPnl.toFixed(2)} updated directly on profile balance ledger.`);
-      updateLivePositionsPNL();
-    };
+        .subtitle {
+            text-align: center;
+            color: #8492a6;
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
 
-    function generateOrderBookData() {
-      const asks = document.getElementById('orderbook-asks'), bids = document.getElementById('orderbook-bids');
-      const spread = document.getElementById('center-spread-price'), header = document.getElementById('live-crypto-price');
-      if(!asks || !bids) return;
-      
-      let basePrice = 94200 + Math.random() * 100;
-      window.currentMarketPriceGlobal = basePrice;
-      spread.innerText = `$${basePrice.toFixed(2)}`;
-      if(header) header.innerHTML = `$${basePrice.toFixed(2)} <span class="text-xs text-emerald-500 font-normal">+2.4%</span>`;
+        /* Responsive Grid System */
+        #nodes-display-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 15px 0;
+        }
 
-      asks.innerHTML = ''; bids.innerHTML = '';
-      for(let i=1; i<=5; i++) {
-        let pAsks = basePrice + (i * (0.6 + Math.random())), sAsks = (Math.random() * 1.5).toFixed(4);
-        asks.innerHTML += `<div class="flex justify-between px-1 text-[11px]"><div>$${pAsks.toFixed(2)}</div><div class="text-slate-500">${sAsks}</div></div>`;
-        let pBids = basePrice - (i * (0.6 + Math.random())), sBids = (Math.random() * 1.5).toFixed(4);
-        bids.innerHTML += `<div class="flex justify-between px-1 text-[11px]"><div>$${pBids.toFixed(2)}</div><div class="text-slate-500">${sBids}</div></div>`;
-      }
-      updateLivePositionsPNL();
-    }
-    setInterval(generateOrderBookData, 1500);
-    window.onload = generateOrderBookData;
-    window.openDepositModal = openDepositModal;
-    window.closeDepositModal = closeDepositModal;
-    window.copyWalletAddress = copyWalletAddress;
-    window.handleLogoTap = handleLogoTap;
-    window.closeAdminModal = closeAdminModal;
-    window.verifyAdminKey = verifyAdminKey;
-    window.exitAdminMode = exitAdminMode;
-  </script>
+        /* Glassmorphism Premium Node Card */
+        .node-premium-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .node-premium-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 230, 118, 0.1);
+            border-color: rgba(0, 230, 118, 0.2);
+        }
+
+        /* Special Promo Border Activation */
+        .promo-active-border {
+            border: 1px solid rgba(255, 62, 62, 0.2) !important;
+            background: linear-gradient(145deg, rgba(255, 62, 62, 0.02) 0%, rgba(255,255,255,0.01) 100%);
+        }
+
+        .promo-active-border:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 62, 62, 0.15) !important;
+            border-color: rgba(255, 62, 62, 0.4) !important;
+        }
+
+        /* Image Containment Design */
+        .node-image-wrap {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+        }
+
+        .node-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.85) contrast(1.1);
+        }
+
+        .node-badge-cost {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            color: #0b0f19;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        /* Hot Offer Ribbon badge */
+        .promo-ribbon {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #ff3e3e;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 900;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Metadata Parameters Styling */
+        .node-meta-body {
+            padding: 20px;
+        }
+
+        .node-meta-body h3 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #8492a6;
+            margin-bottom: 10px;
+        }
+
+        .cycle-tag {
+            background: rgba(255,255,255,0.05);
+            color: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+        }
+
+        /* Realtime Distribution Clock Block */
+        .timer-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255,255,255,0.03);
+            padding: 10px;
+            border-radius: 12px;
+            margin: 18px 0 15px 0;
+        }
+
+        .timer-icon {
+            font-size: 16px;
+        }
+
+        .timer-text-wrap small {
+            display: block;
+            font-size: 10px;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .timer-text-wrap p {
+            margin: 2px 0 0 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: #f59e0b;
+            font-family: monospace;
+        }
+
+        /* Interactive Action Elements */
+        .node-action-btn {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(0,230,118,0.3);
+            color: #00e676;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .node-action-btn:hover {
+            background: #00e676;
+            color: #0b0f19;
+            box-shadow: 0 5px 15px rgba(0,230,118,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Pak Trade Infrastructure Nodes</h1>
+        <p class="subtitle">Select and lease an optimized cloud server array to initiate distributed data cycles.</p>
+        
+        <!-- Target Grid for JavaScript Injection Loop -->
+        <div id="nodes-display-grid"></div>
+    </div>
+
+    <script>
+        // System Master Node Dataset (21 Nodes Array)
+        const pakTradeNodes = [
+            // --- NORMAL PODS (30 Days Standard Cycle) ---
+            { id: "p_a1", name: "Pod Alpha-1", cost: 200, dailyYield: 15, days: 30, img: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&q=80", cat: "normal" },
+            { id: "p_a2", name: "Pod Alpha-2", cost: 400, dailyYield: 30, days: 30, img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&q=80", cat: "normal" },
+            { id: "p_a3", name: "Pod Alpha-3", cost: 600, dailyYield: 45, days: 30, img: "https://images.unsplash.com/photo-1563770660941-20978e870e26?w=400&q=80", cat: "normal" },
+            { id: "p_a4", name: "Pod Alpha-4", cost: 800, dailyYield: 60, days: 30, img: "https://images.unsplash.com/photo-1600132806370-bf17e65e942f?w=400&q=80", cat: "normal" },
+            { id: "p_a5", name: "Pod Alpha-5", cost: 1000, dailyYield: 75, days: 30, img: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80", cat: "normal" },
+            { id: "p_a6", name: "Pod Alpha-6", cost: 1500, dailyYield: 112, days: 30, img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&q=80", cat: "normal" },
+            { id: "p_a7", name: "Pod Alpha-7", cost: 2000, dailyYield: 150, days: 30, img: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=400&q=80", cat: "normal" },
+            
+            // --- 5 SPECIAL MINING MACHINE OFFERS (10-20 Days Short-Term Cycles) ---
+            { id: "r_s1", name: "Rig Stratum-1 [PROMO]", cost: 3000, dailyYield: 300, days: 10, img: "https://images.unsplash.com/photo-1640340434855-6084b1f4901c?w=400&q=80", cat: "special" },
+            { id: "r_s2", name: "Rig Stratum-2 [PROMO]", cost: 4000, dailyYield: 360, days: 12, img: "https://images.unsplash.com/photo-1624996379697-f01d168b1a52?w=400&q=80", cat: "special" },
+            { id: "r_s3", name: "Rig Stratum-3 [PROMO]", cost: 5000, dailyYield: 420, days: 15, img: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=400&q=80", cat: "special" },
+            { id: "r_s4", name: "Rig Stratum-4 [PROMO]", cost: 7000, dailyYield: 560, days: 18, img: "https://images.unsplash.com/photo-1601597111158-2fceff292cdc?w=400&q=80", cat: "special" },
+            { id: "r_s5", name: "Rig Stratum-5 [PROMO]", cost: 10000, dailyYield: 750, days: 20, img: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=400&q=80", cat: "special" },
+            
+            // --- HIGH-TIER ENTERPRISE OPERATIONS (45 Days Cycle) ---
+            { id: "r_s6", name: "Rig Stratum-6", cost: 15000, dailyYield: 1125, days: 45, img: "https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=400&q=80", cat: "exclusive" },
+            { id: "r_s7", name: "Rig Stratum-7", cost: 20000, dailyYield: 1500, days: 45, img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&q=80", cat: "exclusive" },
+            { id: "m_o1", name: "Matrix Overdrive-1", cost: 30000, dailyYield: 2400, days: 45, img: "https://images.unsplash.com/photo-1639322537228-f710d846310a?w=400&q=80", cat: "exclusive" },
+            { id: "m_o2", name: "Matrix Overdrive-2", cost: 40000, dailyYield: 3200, days: 45, img: "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=400&q=80", cat: "exclusive" },
+            { id: "m_o3", name: "Matrix Overdrive-3", cost: 50000, dailyYield: 4000, days: 45, img: "https://images.unsplash.com/photo-1631553127988-347f8976b3f7?w=400&q=80", cat: "exclusive" },
+            { id: "m_o4", name: "Matrix Overdrive-4", cost: 60000, dailyYield: 4800, days: 45, img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&q=80", cat: "exclusive" },
+            { id: "m_o5", name: "Matrix Overdrive-5", cost: 70000, dailyYield: 5600, days: 45, img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&q=80", cat: "exclusive" },
+            { id: "m_o6", name: "Matrix Overdrive-6", cost: 85000, dailyYield: 6800, days: 45, img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&q=80", cat: "exclusive" },
+            { id: "m_qc", name: "Matrix Quantum-Core", cost: 100000, dailyYield: 8500, days: 45, img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400&q=80", cat: "exclusive" }
+        ];
+
+        // Dynamic Card Interface Generation Module
+        function renderPakTradeStore() {
+            const gridTarget = document.getElementById('nodes-display-grid');
+            gridTarget.innerHTML = ''; 
+
+            pakTradeNodes.forEach((node) => {
+                const totalProfit = node.dailyYield * node.days;
+                const isSpecial = node.cat === "special";
+                
+                // Color configuration mapping logic based on type rules
+                const badgeColor = isSpecial ? "#ff3e3e" : "#00e676";
+                const textShadow = isSpecial ? "0 4px 10px rgba(255, 62, 62, 0.4)" : "0 4px 10px rgba(0, 230, 118, 0.4)";
+                
+                const cardHtml = `
+                    <div class="node-premium-card ${isSpecial ? 'promo-active-border' : ''}">
+                        <div class="node-image-wrap">
+                            ${isSpecial ? `<span class="promo-ribbon">HOT OFFER</span>` : ''}
+                            <img src="${node.img}" alt="${node.name}" loading="lazy">
+                            <span class="node-badge-cost" style="background: ${badgeColor}; box-shadow: ${textShadow};">
+                                Rs. ${node.cost.toLocaleString()}
+                            </span>
+                        </div>
+                        
+                        <div class="node-meta-body">
+                            <h3>${node.name}</h3>
+                            <div class="meta-row">
+                                <span>Daily Yield:</span>
+                                <b style="color: ${badgeColor}; font-weight:700;">Rs. ${node.dailyYield.toLocaleString()}</b>
+                            </div>
+                            <div class="meta-row">
+                                <span>Total Income:</span>
+                                <b style="color: #fff;">Rs. ${totalProfit.toLocaleString()}</b>
+                            </div>
+                            <div class="meta-row">
+                                <span>Contract Cycle:</span>
+                                <span class="cycle-tag" style="${isSpecial ? 'color: #ff3e3e; background: rgba(255,62,62,0.1);' : ''}">
+                                    ${node.days} Days Block
+                                </span>
+                            </div>
+                            
+                            <div class="timer-box">
+                                <span class="timer-icon">${isSpecial ? '🔥' : '⚡'}</span>
+                                <div class="timer-text-wrap">
+                                    <small>${isSpecial ? 'Promo Loop Sync' : 'Next Distribution Loop'}</small>
+                                    <p class="realtime-clock-node">24:00:00</p>
+                                </div>
+                            </div>
+                            
+                            <button class="node-action-btn" style="${isSpecial ? 'border-color: #ff3e3e; color: #ff3e3e;' : ''}" 
+                                    onclick="initializeLeaseNode('${node.id}', ${node.cost})">
+                                ${isSpecial ? 'Lease Special Node' : 'Lease Computing Node'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                gridTarget.innerHTML += cardHtml;
+            });
+            
+            initializeSystemGlobalClocks();
+        }
+
+        // Live Countdown Loops Logic Engine
+        function initializeSystemGlobalClocks() {
+            setInterval(() => {
+                const clocks = document.querySelectorAll('.realtime-clock-node');
+                const now = new Date();
+                const hrs = 23 - now.getHours();
+                const mins = 59 - now.getMinutes();
+                const secs = 59 - now.getSeconds();
+
+                const timeString = 
+                    `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+                clocks.forEach(clock => {
+                    clock.innerText = timeString;
+                });
+            }, 1000);
+        }
+
+        // Interactive Lease Trigger Action Function
+        function initializeLeaseNode(nodeId, nodeCost) {
+            console.log(`Lease request initialized for node: ${nodeId} with price Rs.${nodeCost}`);
+            alert(`Node Request Processing!\nTarget Node ID: ${nodeId}\nRequired Balance: Rs. ${nodeCost}`);
+            // Firebase balance modification logic or admin log stream can be attached here
+        }
+
+        // Auto Execute Render Engine on page init
+        window.onload = renderPakTradeStore;
+    </script>
 </body>
 </html>
