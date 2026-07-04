@@ -2,123 +2,188 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eagle Eye Trading Terminal</title>
+  <title>Nexus Premium Trading Terminal</title>
   <!-- Tailwind CSS CDN for modern styling -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>
-    /* Sleek background with smooth transitions */
     body {
-      background-color: #0b0e14;
+      background-color: #06090e;
       color: #e2e8f0;
       font-family: system-ui, -apple-system, sans-serif;
     }
     .glass {
-      background: rgba(23, 29, 42, 0.65);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(13, 20, 35, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    /* Custom scrollbar for dark terminal theme */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.1);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
     }
   </style>
 </head>
-<body class="min-h-screen p-4 flex flex-col items-center">
+<body class="min-h-screen p-3 md:p-6 flex flex-col items-center">
 
-  <!-- Header & Hidden Gesture Logo -->
-  <header class="w-full max-w-4xl flex justify-between items-center mb-6 p-4 glass rounded-2xl">
-    <div id="app-logo" onclick="handleLogoTap()" class="flex items-center gap-2 cursor-pointer select-none active:scale-95 transition-transform">
-      <div class="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center font-bold text-black shadow-[0_0_15px_rgba(16,185,129,0.3)]">⚡</div>
-      <span class="font-bold text-lg tracking-wider bg-gradient-to-r select-none from-emerald-400 to-cyan-400 bg-clip-text text-transparent">NEXUS TRADING</span>
+  <!-- TOP HEADER PANEL WITH SECRET TAP TARGET LOGO -->
+  <header class="w-full max-w-6xl flex justify-between items-center mb-4 p-4 glass rounded-2xl border border-slate-800/40">
+    <div id="app-logo" onclick="handleLogoTap()" class="flex items-center gap-2.5 cursor-pointer select-none active:scale-95 transition-transform">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-400 flex items-center justify-center font-bold text-black shadow-[0_0_20px_rgba(16,185,129,0.25)]">⚡</div>
+      <div>
+        <span class="font-extrabold text-lg tracking-wider bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">NEXUS</span>
+        <span class="text-[10px] text-slate-500 block font-mono tracking-widest uppercase -mt-1">Terminal v2.0</span>
+      </div>
     </div>
-    <div class="text-right">
-      <span class="text-xs text-gray-400 block">Account Status</span>
-      <span class="text-sm font-semibold text-emerald-400" id="user-display-name">Loading System...</span>
+    <div class="text-right flex items-center gap-3">
+      <div class="hidden sm:block">
+        <span class="text-[10px] text-gray-500 block uppercase tracking-wider">Account Status</span>
+        <span class="text-sm font-semibold text-emerald-400" id="user-display-name">Loading System...</span>
+      </div>
+      <div id="user-display-mobile" class="sm:hidden text-sm font-semibold text-emerald-400">Loading...</div>
     </div>
   </header>
 
-  <!-- MAIN USER VIEW -->
-  <main id="user-view" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-6">
-    <!-- Trading Chart Simulation Placeholder -->
-    <div class="md:col-span-2 glass rounded-2xl p-6 min-h-[300px] flex flex-col justify-between">
-      <div>
-        <h3 class="text-gray-400 text-sm font-medium mb-1">BTC / USDT</h3>
-        <h2 class="text-3xl font-extrabold text-emerald-400">$94,250.00 <span class="text-xs text-emerald-500 font-normal">+2.4%</span></h2>
+  <!-- MAIN OPERATIONAL VIEW PLATFORM -->
+  <main id="user-view" class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-4 gap-4">
+    
+    <!-- LEFT COLUMN: REAL-TIME INTERACTIVE CHART PLUGINS -->
+    <div class="lg:col-span-3 flex flex-col gap-4">
+      <div class="glass rounded-2xl p-4 flex flex-col justify-between min-h-[420px] relative overflow-hidden">
+        <div class="flex justify-between items-start mb-3 z-10">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-lg text-white">BTC / USDT</span>
+              <span class="text-xs font-mono bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded">LIVE</span>
+            </div>
+            <h2 class="text-2xl font-black text-emerald-400 mt-1" id="live-crypto-price">$94,250.00</h2>
+          </div>
+          <div class="text-right text-xs font-mono text-slate-400">
+            <div>24h High: <span class="text-white">$95,110</span></div>
+            <div>24h Low: <span class="text-white">$92,400</span></div>
+          </div>
+        </div>
+
+        <!-- TradingView Embedded Interactive Widget Integration -->
+        <div class="w-full h-[320px] rounded-xl overflow-hidden border border-slate-800/60">
+          <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_chart&symbol=BINANCE%3ABTCUSDT&interval=5&hidesidetoolbar=1&symboledit=0&saveimage=1&toolbarbg=0b0e14&studies=%5B%5D&theme=dark&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en" class="w-full h-full border-0"></iframe>
+        </div>
       </div>
-      <div class="h-32 flex items-end gap-1.5 pt-4">
-        <!-- Mock bars for visual aesthetics -->
-        <div class="w-full bg-emerald-500/20 h-1/3 rounded-t"></div>
-        <div class="w-full bg-emerald-500/30 h-1/2 rounded-t"></div>
-        <div class="w-full bg-rose-500/30 h-2/5 rounded-t"></div>
-        <div class="w-full bg-emerald-500/40 h-3/4 rounded-t"></div>
-        <div class="w-full bg-emerald-500/50 h-full rounded-t"></div>
+
+      <!-- BOTTOM ROW ROW INSIDE PANEL: TRANSACTIONS & EXCHANGE BALANCES -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Wallet Actions and Operations Box -->
+        <div class="glass rounded-2xl p-5 flex flex-col justify-between">
+          <div>
+            <span class="text-xs text-slate-400 uppercase tracking-widest block mb-1">Available Account Portfolio Balance</span>
+            <h3 class="text-3xl font-black text-white tracking-tight mb-4" id="balance-display">$0.00</h3>
+            
+            <div class="space-y-2.5">
+              <div>
+                <label class="text-[11px] text-slate-400 block mb-1 font-medium">Execution Amount (USDT)</label>
+                <input type="number" id="tx-amount" placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-sm transition-colors font-mono">
+              </div>
+              <div class="flex gap-2 pt-1">
+                <button onclick="submitRequest('deposit')" class="w-1/2 bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold py-2.5 rounded-xl transition-all cursor-pointer active:scale-[0.98] text-sm">Deposit Fund</button>
+                <button onclick="submitRequest('withdrawal')" class="w-1/2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-white font-bold py-2.5 rounded-xl transition-all cursor-pointer active:scale-[0.98] text-sm">Withdrawal</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simulated Trading Simulator Console Log Panel -->
+        <div class="glass rounded-2xl p-5 flex flex-col justify-between">
+          <div>
+            <span class="text-xs text-slate-400 uppercase tracking-widest block mb-2">Live Execution Positions</span>
+            <div class="border border-dashed border-slate-800 rounded-xl p-6 text-center text-xs text-slate-500 flex flex-col items-center justify-center min-h-[110px]">
+              <p>⚡ No current trade contracts initialization profiles deployed on network infrastructure pools.</p>
+            </div>
+          </div>
+          <p class="text-[10px] text-slate-500 text-center mt-2">Manual validation required for financial adjustments profiles accounts.</p>
+        </div>
       </div>
     </div>
 
-    <!-- User Wallet & Manual Request Panel -->
-    <div class="glass rounded-2xl p-6 flex flex-col justify-between">
-      <div>
-        <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1">Your Total Balance</span>
-        <h3 class="text-2xl font-bold text-white mb-6" id="balance-display">$0.00</h3>
-        
-        <div class="space-y-3">
-          <div>
-            <label class="text-xs text-gray-400 block mb-1">Amount (USDT)</label>
-            <input type="number" id="tx-amount" placeholder="0.00" class="w-full bg-slate-900/80 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 transition-colors">
-          </div>
-          <button onclick="submitRequest('deposit')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold py-2.5 rounded-xl transition-colors cursor-pointer">Request Deposit</button>
-          <button onclick="submitRequest('withdrawal')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl border border-slate-700/50 transition-colors cursor-pointer">Request Withdrawal</button>
-        </div>
+    <!-- RIGHT COLUMN: LIQUIDITY FLUIDITY LIVE ORDER BOOK LOGS -->
+    <div class="glass rounded-2xl p-4 flex flex-col h-full min-h-[500px]">
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800/60">📊 Real-time Liquidity Order Book</h3>
+      <div class="grid grid-cols-2 text-[10px] text-slate-500 font-mono mb-2 px-1">
+        <div>PRICE (USDT)</div>
+        <div class="text-right">SIZE (BTC)</div>
       </div>
-      <p class="text-[10px] text-gray-500 mt-4 text-center">Transactions require manual operator approval.</p>
+      
+      <!-- Asks Selling Blocks -->
+      <div id="orderbook-asks" class="flex flex-col-reverse gap-1 text-rose-400 font-mono text-xs mb-3">
+        <!-- Populated via system loop -->
+      </div>
+      
+      <!-- Live Center Spread Metrics ticker -->
+      <div class="bg-slate-900/60 p-2 rounded-lg text-center font-bold text-sm my-2 border border-slate-800/40 text-white font-mono" id="center-spread-price">
+        $94,250.00
+      </div>
+
+      <!-- Bids Buying Blocks -->
+      <div id="orderbook-bids" class="flex flex-col gap-1 text-emerald-400 font-mono text-xs">
+        <!-- Populated via system loop -->
+      </div>
     </div>
   </main>
 
-  <!-- HIDDEN EAGLE EYE ADMIN PASSCODE MODAL -->
-  <div id="admin-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="glass max-w-sm w-full rounded-2xl p-6 shadow-2xl border border-emerald-500/20">
-      <h3 class="text-lg font-bold text-emerald-400 mb-2 flex items-center gap-2">👁️ Eagle Eye System</h3>
-      <p class="text-xs text-gray-400 mb-4">Enter master security authentication token to initialize backend administrative terminal override.</p>
-      <input type="password" id="admin-key-input" placeholder="Enter Secure Admin Key" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white mb-4 focus:outline-none focus:border-emerald-500 text-center tracking-widest">
+  <!-- HIDDEN EAGLE EYE ADMIN PASSCODE MODAL CONTROLLERS OVERRIDES -->
+  <div id="admin-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4">
+    <div class="glass max-w-sm w-full rounded-2xl p-6 shadow-2xl border border-emerald-500/10">
+      <h3 class="text-base font-bold text-emerald-400 mb-1 flex items-center gap-2">👁️ Eagle Eye Terminal Override</h3>
+      <p class="text-xs text-slate-400 mb-4 font-normal">Security verification credentials token required for absolute matrix administrative console deployment views.</p>
+      <input type="password" id="admin-key-input" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white mb-4 focus:outline-none focus:border-emerald-500 text-center tracking-widest font-mono text-lg">
       <div class="flex gap-2">
-        <button onclick="closeAdminModal()" class="w-1/2 bg-slate-800 text-gray-300 py-2 rounded-xl text-sm">Cancel</button>
-        <button onclick="verifyAdminKey()" class="w-1/2 bg-emerald-500 text-black font-bold py-2 rounded-xl text-sm shadow-lg shadow-emerald-500/20">Authenticate</button>
+        <button onclick="closeAdminModal()" class="w-1/2 bg-slate-900 text-slate-400 py-2.5 rounded-xl text-xs font-bold border border-slate-800">Cancel</button>
+        <button onclick="verifyAdminKey()" class="w-1/2 bg-emerald-500 text-black font-black py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/10">Verify Matrix</button>
       </div>
     </div>
   </div>
 
-  <!-- EAGLE EYE ADMIN CONTROL PANEL VIEW -->
-  <div id="admin-view" class="hidden w-full max-w-4xl flex flex-col gap-6">
-    <div class="w-full glass rounded-2xl p-4 flex justify-between items-center border border-red-500/20">
+  <!-- FULL BACKEND OVERVIEW ADMIN MANAGEMENT VIEWPORT -->
+  <div id="admin-view" class="hidden w-full max-w-6xl flex flex-col gap-4">
+    <div class="w-full glass rounded-2xl p-4 flex justify-between items-center border border-red-500/20 shadow-xl">
       <div>
-        <span class="inline-block bg-red-500/10 text-red-400 text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded mb-1">Admin Mode Active</span>
-        <h2 class="text-xl font-bold text-white">Eagle Eye Operator Console</h2>
+        <span class="inline-block bg-red-500/10 text-red-400 text-[9px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-md mb-0.5">Operator Command Privileges</span>
+        <h2 class="text-lg font-black text-white">Eagle Eye Core Console</h2>
       </div>
-      <button onclick="exitAdminMode()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-xl text-gray-300 transition-colors">Exit Admin Panel</button>
+      <button onclick="exitAdminMode()" class="bg-slate-900 border border-slate-800 hover:bg-slate-800 text-xs px-3 py-2 rounded-xl text-slate-300 font-bold transition-colors cursor-pointer">Close Operator Shield</button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Admin Control Transactions Queue -->
-      <div class="md:col-span-2 glass rounded-2xl p-6">
-        <h3 class="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">📊 Pending Requests Queue</h3>
-        <div id="admin-queue-list" class="space-y-3 max-h-[400px] overflow-y-auto pr-1">
-          <p class="text-xs text-gray-500 italic">No transactions currently awaiting confirmation.</p>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Admin Decisions Processing Ledger Queue -->
+      <div class="lg:col-span-2 glass rounded-2xl p-5 border border-slate-800/30">
+        <h3 class="text-xs font-bold text-slate-300 mb-4 uppercase tracking-wider flex items-center gap-2">⏳ Actionable Transactions Registry</h3>
+        <div id="admin-queue-list" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+          <p class="text-xs text-slate-500 italic">Network configurations operating clean. No transactions awaiting approval updates profiles.</p>
         </div>
       </div>
 
-      <!-- Complete User Database Visibility -->
-      <div class="glass rounded-2xl p-6">
-        <h3 class="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">👥 Global User Directory</h3>
-        <div id="admin-user-list" class="space-y-3 max-h-[400px] overflow-y-auto">
-          <!-- Users dynamic profile load -->
+      <!-- Core Global Directory Users List view -->
+      <div class="glass rounded-2xl p-5 border border-slate-800/30">
+        <h3 class="text-xs font-bold text-slate-300 mb-4 uppercase tracking-wider flex items-center gap-2">👥 System Identity Registrations</h3>
+        <div id="admin-user-list" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+          <!-- Users profile loops loaded dynamically -->
         </div>
       </div>
     </div>
   </div>
 
-  <!-- FIREBASE CONFIGURATION & DYNAMIC AUTH SYSTEM LOGIC -->
+  <!-- CORE SCRIPTS ENGINE INTERACTIVE ROUTERS -->
+  <!-- Firebase Deployment Modules Module Context Config -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // Aapki exact Firebase configuration credentials
+    // Dynamic Credentials configuration initialization variables matching live deployment
     const firebaseConfig = {
       apiKey: "AIzaSyBqtvNJW_HNv4H2EAzeAhNL-tiUjX1huEg",
       authDomain: "trade51-f64d5.firebaseapp.com",
@@ -129,73 +194,70 @@
       appId: "1:38759095579:web:013d72ab4b5183f99347be"
     };
 
-    // Initialize Services
+    // Service initializations hooks
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const auth = getAuth(app);
     const googleProvider = new GoogleAuthProvider();
 
-    // Track state variables globally inside module context
     let currentUser = null;
     let balanceListener = null;
 
-    // --- Google Login Trigger Function ---
+    // --- Google Authentication Providers Logic handlers ---
     window.loginWithGoogle = function() {
       signInWithPopup(auth, googleProvider)
-        .then((result) => {
-          console.log("Logged in user:", result.user);
-        })
         .catch((error) => {
-          console.error("Login Error:", error);
-          alert("Login failed: " + error.message);
+          console.error("Auth Engine Error Profile Trace:", error);
+          alert("Authentication initialization failed: " + error.message);
         });
     };
 
-    // --- Logout Function ---
     window.logoutUser = function() {
       signOut(auth).then(() => {
-        alert("Logged out successfully!");
+        alert("Session terminated securely.");
       });
     };
 
-    // --- Dynamic Authentication State Listener ---
+    // --- Dynamic Network Authentication Listener Status State Mapping ---
     onAuthStateChanged(auth, (user) => {
-      const userDisplay = document.getElementById('user-display-name');
+      const displayDesk = document.getElementById('user-display-name');
+      const displayMob = document.getElementById('user-display-mobile');
       
       if (user) {
         currentUser = user;
-        userDisplay.innerHTML = `${user.displayName || user.email} <button onclick="logoutUser()" class="text-[10px] text-rose-400 underline ml-2 cursor-pointer">Logout</button>`;
+        const profileStr = `${user.displayName || user.email} <button onclick="logoutUser()" class="text-[10px] text-rose-400 font-bold underline ml-1.5 cursor-pointer hover:text-rose-500">Logout</button>`;
+        displayDesk.innerHTML = profileStr;
+        displayMob.innerHTML = profileStr;
         
-        // Dynamic DB node reference setup matching user's real UID
         const userRef = ref(db, `users/${user.uid}`);
-        
-        if (balanceListener) balanceListener(); // purana listener clear karein
+        if (balanceListener) balanceListener();
         
         balanceListener = onValue(userRef, (snapshot) => {
           const data = snapshot.val();
           if (data) {
             document.getElementById('balance-display').innerText = `$${data.balance.toFixed(2)}`;
           } else {
-            // Naye user ke liye database entry banaen
             set(userRef, {
               id: user.uid,
-              name: user.displayName || "Anonymous User",
+              name: user.displayName || "Nexus Trader",
               email: user.email,
-              balance: 1000.00 // Default registration bonus
+              balance: 1000.00
             });
           }
         });
       } else {
         currentUser = null;
         document.getElementById('balance-display').innerText = "$0.00";
-        userDisplay.innerHTML = `<button onclick="loginWithGoogle()" class="bg-emerald-500 text-black font-bold text-xs px-3 py-1.5 rounded-xl cursor-pointer shadow-lg shadow-emerald-500/20">Login with Google</button>`;
+        const loginBtn = `<button onclick="loginWithGoogle()" class="bg-gradient-to-r from-emerald-500 to-cyan-500 text-black font-extrabold text-[11px] px-3 py-1.5 rounded-xl cursor-pointer shadow-md transition-transform active:scale-95">Login Identity</button>`;
+        displayDesk.innerHTML = loginBtn;
+        displayMob.innerHTML = loginBtn;
       }
     });
 
-    // --- Deposit & Withdrawal Request Handler ---
+    // --- End User Manual Transfer Request Actions ---
     window.submitRequest = function(type) {
       if (!currentUser) {
-        alert("Please login first to request transitions!");
+        alert("Authentication validation missing! Please execute credential login first.");
         return;
       }
       
@@ -203,7 +265,7 @@
       const amount = parseFloat(amountInput.value);
 
       if (!amount || amount <= 0) {
-        alert("Please enter a valid amount!");
+        alert("Invalid monetary metrics parameters provided!");
         return;
       }
 
@@ -218,12 +280,12 @@
         amount: amount,
         status: "pending"
       }).then(() => {
-        alert(`${type.toUpperCase()} request submitted for manual approval!`);
+        alert(`${type.toUpperCase()} contract profile routing logs pushed for administrator manual audit.`);
         amountInput.value = '';
       });
     };
 
-    // --- Admin Side Panel Listeners ---
+    // --- Dynamic Network Admin Dashboard Synchronization Pipelines ---
     onValue(ref(db, 'transactions/'), (snapshot) => {
       const queueContainer = document.getElementById('admin-queue-list');
       queueContainer.innerHTML = '';
@@ -236,15 +298,15 @@
           if(tx.status === 'pending') {
             pendingCount++;
             const card = document.createElement('div');
-            card.className = "p-3 bg-slate-900/60 rounded-xl border border-slate-800 flex justify-between items-center";
+            card.className = "p-3 bg-slate-950 rounded-xl border border-slate-900 flex justify-between items-center text-xs";
             card.innerHTML = `
               <div>
-                <div class="text-xs font-semibold text-white">${tx.userName}</div>
-                <div class="text-[11px] ${tx.type === 'deposit' ? 'text-emerald-400' : 'text-rose-400'} uppercase font-bold mt-0.5">${tx.type} • $${tx.amount}</div>
+                <div class="font-bold text-white flex items-center gap-1.5">${tx.userName} <span class="text-[9px] text-slate-500 font-mono">(${tx.userId.substring(0,6)}...)</span></div>
+                <div class="text-[10px] ${tx.type === 'deposit' ? 'text-emerald-400' : 'text-rose-400'} uppercase font-extrabold mt-0.5 tracking-wider font-mono">${tx.type} • $${tx.amount.toFixed(2)}</div>
               </div>
-              <div class="flex gap-2">
-                <button onclick="processTx('${tx.txId}', '${tx.userId}', '${tx.type}', ${tx.amount}, 'approved')" class="bg-emerald-500 text-black font-bold text-xs px-2.5 py-1 rounded-lg cursor-pointer">Approve</button>
-                <button onclick="processTx('${tx.txId}', '${tx.userId}', '${tx.type}', ${tx.amount}, 'rejected')" class="bg-rose-500 text-white font-bold text-xs px-2.5 py-1 rounded-lg cursor-pointer">Reject</button>
+              <div class="flex gap-1.5">
+                <button onclick="processTx('${tx.txId}', '${tx.userId}', '${tx.type}', ${tx.amount}, 'approved')" class="bg-emerald-500 hover:bg-emerald-600 text-black font-black text-[11px] px-3 py-1 rounded-lg cursor-pointer transition-colors">Approve</button>
+                <button onclick="processTx('${tx.txId}', '${tx.userId}', '${tx.type}', ${tx.amount}, 'rejected')" class="bg-slate-900 border border-slate-800 text-rose-400 font-bold text-[11px] px-3 py-1 rounded-lg cursor-pointer transition-colors">Reject</button>
               </div>
             `;
             queueContainer.appendChild(card);
@@ -252,7 +314,7 @@
         });
       }
       if(pendingCount === 0) {
-        queueContainer.innerHTML = '<p class="text-xs text-gray-500 italic">No transactions currently awaiting confirmation.</p>';
+        queueContainer.innerHTML = '<p class="text-xs text-slate-500 italic text-center py-4">Network configurations operating clean. No transactions awaiting approval updates profiles.</p>';
       }
     });
 
@@ -264,20 +326,20 @@
         Object.keys(data).forEach(key => {
           const user = data[key];
           const div = document.createElement('div');
-          div.className = "p-2.5 bg-slate-900/40 rounded-xl text-xs flex justify-between items-center";
+          div.className = "p-2.5 bg-slate-950/60 border border-slate-900 rounded-xl text-xs flex justify-between items-center";
           div.innerHTML = `
             <div>
-              <p class="font-semibold text-gray-200">${user.name}</p>
-              <p class="text-[10px] text-gray-500">ID: ${user.id}</p>
+              <p class="font-bold text-slate-200">${user.name}</p>
+              <p class="text-[9px] font-mono text-slate-500">ID: ${user.id.substring(0,10)}...</p>
             </div>
-            <span class="font-mono text-emerald-400 font-bold">$${user.balance ? user.balance.toFixed(2) : '0.00'}</span>
+            <span class="font-mono text-emerald-400 font-extrabold bg-emerald-500/5 px-2 py-1 rounded-md border border-emerald-500/10">$${user.balance ? user.balance.toFixed(2) : '0.00'}</span>
           `;
           userContainer.appendChild(div);
         });
       }
     });
 
-    // --- Admin Transaction Decision Router ---
+    // --- Administrative Core Routing Operations Decision Ledger logic executors ---
     window.processTx = function(txId, userId, type, amount, nextStatus) {
       if(nextStatus === 'approved') {
         const userBalanceRef = ref(db, `users/${userId}/balance`);
@@ -295,12 +357,13 @@
     };
   </script>
 
-  <!-- GESTURE INTERACTION FLOW & PANEL VIEW CONTROLLERS -->
+  <!-- USER GESTURES AND INTERACTIVE SYSTEMS SIMULATIONS CONFIGS -->
   <script>
     let tapCount = 0;
     let lastTap = 0;
-    const MASTER_KEY = "admin123"; // Aap chahein toh is key ko change kar sakte hain
+    const MASTER_KEY = "admin123"; // Aap chahein toh is key ko badal sakte hain
 
+    // Secret gesture tracking matrix 
     function handleLogoTap() {
       const now = new Date().getTime();
       if (now - lastTap > 1500) {
@@ -327,7 +390,7 @@
         document.getElementById('user-view').classList.add('hidden');
         document.getElementById('admin-view').classList.remove('hidden');
       } else {
-        alert("Invalid Master Key Authentication Failed!");
+        alert("Authentication code validation failed. Absolute matrix entry access denied.");
         closeAdminModal();
       }
     }
@@ -336,6 +399,41 @@
       document.getElementById('admin-view').classList.add('hidden');
       document.getElementById('user-view').classList.remove('hidden');
     }
+
+    // --- Dynamic Orderbook Liquid Simulation Loop Engine ---
+    function generateOrderBookData() {
+      const asksContainer = document.getElementById('orderbook-asks');
+      const bidsContainer = document.getElementById('orderbook-bids');
+      const centerSpread = document.getElementById('center-spread-price');
+      const livePriceHeader = document.getElementById('live-crypto-price');
+      
+      if(!asksContainer || !bidsContainer) return;
+      
+      let basePrice = 94200 + Math.random() * 100;
+      centerSpread.innerText = `$${basePrice.toFixed(2)}`;
+      if(livePriceHeader) livePriceHeader.innerHTML = `$${basePrice.toFixed(2)} <span class="text-xs text-emerald-500 font-normal">+2.4%</span>`;
+
+      asksContainer.innerHTML = '';
+      bidsContainer.innerHTML = '';
+
+      // Create Fake Selling Orders (Asks - Red)
+      for(let i=1; i<=6; i++) {
+        let price = basePrice + (i * (0.5 + Math.random()));
+        let size = (Math.random() * 2).toFixed(4);
+        asksContainer.innerHTML += `<div class="flex justify-between px-1 hover:bg-rose-500/5 py-0.5 rounded"><div>$${price.toFixed(2)}</div><div class="text-slate-400 text-right">${size}</div></div>`;
+      }
+
+      // Create Fake Buying Orders (Bids - Green)
+      for(let i=1; i<=6; i++) {
+        let price = basePrice - (i * (0.5 + Math.random()));
+        let size = (Math.random() * 2).toFixed(4);
+        bidsContainer.innerHTML += `<div class="flex justify-between px-1 hover:bg-emerald-500/5 py-0.5 rounded"><div>$${price.toFixed(2)}</div><div class="text-slate-400 text-right">${size}</div></div>`;
+      }
+    }
+
+    // Trigger fast execution ticks simulations fluidly
+    setInterval(generateOrderBookData, 1200);
+    window.onload = generateOrderBookData;
   </script>
 </body>
 </html>
