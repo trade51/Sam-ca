@@ -2,114 +2,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pak Trade | Ultimate Dashboard</title>
+    <title>Pak Trade Pro | Premium Terminal</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #0a0e14; color: #ffffff; display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: #111827; padding: 20px; border-right: 1px solid #1f2937; }
-        .logo { font-size: 1.8rem; font-weight: bold; color: #3b82f6; margin-bottom: 30px; }
-        .sidebar li { padding: 15px; cursor: pointer; list-style: none; border-bottom: 1px solid #1f2937; }
-        .main-content { flex: 1; padding: 40px; }
-        .card { background: #111827; padding: 20px; border-radius: 10px; border: 1px solid #374151; margin-bottom: 20px; }
-        .stats-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .node-card { background: #111827; padding: 15px; border-radius: 12px; border: 1px solid #374151; text-align: center; }
-        .node-img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
-        .progress-bar { background: #374151; height: 8px; border-radius: 5px; margin: 10px 0; overflow: hidden; }
-        .progress { background: #3b82f6; height: 100%; }
-        button { padding: 10px 20px; background: #3b82f6; border: none; color: white; cursor: pointer; border-radius: 5px; width: 100%; font-weight: bold; }
-        input { padding: 10px; width: 100%; margin: 10px 0; background: #0a0e14; border: 1px solid #374151; color: white; border-radius: 5px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: radial-gradient(circle at top right, #0f172a, #020617); color: #ffffff; min-height: 100vh; display: flex; }
+        
+        .sidebar { width: 260px; background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1); padding: 30px; position: fixed; height: 100%; }
+        .main-content { margin-left: 260px; flex: 1; padding: 40px; }
+        .card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); transition: 0.3s; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 25px; }
+        .btn-glow { background: linear-gradient(135deg, #3b82f6, #1d4ed8); border: none; padding: 12px 25px; border-radius: 12px; color: white; cursor: pointer; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); font-weight: 600; width: 100%; margin-top: 10px; }
+        .node-img { width: 100%; height: 140px; object-fit: cover; border-radius: 15px; margin-bottom: 15px; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #1f2937; padding: 15px; border-left: 4px solid #3b82f6; border-radius: 5px; display: none; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="logo">Pak Trade</div>
-        <ul>
-            <li>Dashboard</li>
-            <li>Market Data</li>
-            <li id="logoutBtn" style="color: #ef4444;">Logout</li>
+        <h2 style="margin-bottom: 40px; letter-spacing: -1px;">PAK<span style="color:#3b82f6;">TRADE</span></h2>
+        <ul style="list-style:none;">
+            <li style="margin-bottom:20px; color:#3b82f6; font-weight:bold;">Dashboard</li>
+            <li style="margin-bottom:20px; opacity:0.7;">Mining Nodes</li>
+            <li style="margin-bottom:20px; opacity:0.7;">History</li>
+            <li id="logoutBtn" style="color:#ef4444; cursor:pointer; margin-top:50px;">Logout</li>
         </ul>
     </div>
 
     <div class="main-content">
-        <!-- How it works -->
-        <div class="card" style="border: 1px solid #3b82f6;">
-            <h3>How Pak Trade Works</h3>
-            <div style="display: flex; justify-content: space-around; margin-top: 15px; text-align: center;">
-                <div>💳<p style="font-size: 0.7rem;">Deposit</p></div>
-                <div>📈<p style="font-size: 0.7rem;">Mine</p></div>
-                <div>💰<p style="font-size: 0.7rem;">Profit</p></div>
-                <div>🏦<p style="font-size: 0.7rem;">Withdraw</p></div>
-            </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h1>Terminal</h1>
+            <div class="card" style="padding:15px 30px;">Balance: <span id="userBalance" style="color:#10b981; font-weight:bold;">$0.00</span></div>
         </div>
 
-        <!-- Stats -->
-        <div class="stats-cards">
-            <div class="card"><h3>Balance</h3><p id="userBalance" style="color:#3b82f6; font-size:1.5rem; margin-top:10px;">$0.00</p></div>
-            <div class="card"><h3>Security</h3><p style="color:#10b981; font-size:1.5rem; margin-top:10px;">SSL Secure</p></div>
-            <div class="card"><h3>Status</h3><p style="color:#f59e0b; font-size:1.5rem; margin-top:10px;">Active</p></div>
+        <div class="grid">
+            <div class="card"><h3>Deposit</h3><input type="number" id="depAmt" style="width:100%; padding:10px; margin:10px 0; background:transparent; border:1px solid #475569; border-radius:8px; color:white;"><button class="btn-glow" id="subDep">Submit Request</button></div>
+            <div class="card"><h3>Withdraw</h3><input type="number" id="witAmt" style="width:100%; padding:10px; margin:10px 0; background:transparent; border:1px solid #475569; border-radius:8px; color:white;"><button class="btn-glow" style="background:#059669;" id="subWit">Request Profit</button></div>
+            <div class="card"><h3>Referral</h3><p style="margin:10px 0;">Earn 10% on every invite!</p><button class="btn-glow" style="background:#f59e0b;">Copy Link</button></div>
         </div>
 
-        <!-- Deposit -->
-        <div class="card">
-            <h3>Add Funds</h3>
-            <input type="number" id="depositAmount" placeholder="Enter USD Amount">
-            <button id="submitDeposit">Submit Request</button>
-        </div>
-
-        <!-- Mining Nodes -->
-        <h3>Mining Machines</h3>
-        <div class="grid" id="nodesContainer" style="margin-top:20px;"></div>
+        <h3 style="margin-top:40px;">Active Mining Nodes (20+)</h3>
+        <div class="grid" id="nodesContainer"></div>
     </div>
+
+    <div id="toast" class="toast">New Mining Activity Detected!</div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
         import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBqtvNJW_HNv4H2EAzeAhNL-tiUjX1huEg",
-            authDomain: "trade51-f64d5.firebaseapp.com",
-            databaseURL: "https://trade51-f64d5-default-rtdb.firebaseio.com",
-            projectId: "trade51-f64d5",
-            storageBucket: "trade51-f64d5.firebasestorage.app",
-            messagingSenderId: "38759095579",
-            appId: "1:38759095579:web:013d72ab4b5183f99347be"
-        };
-
+        const firebaseConfig = { /* Apna config daal dena */ };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // Auto Generate 20 Nodes
+        // Load 20 Nodes
         const container = document.getElementById('nodesContainer');
         for (let i = 1; i <= 20; i++) {
             container.innerHTML += `
-                <div class="node-card">
+                <div class="card">
                     <img src="https://images.unsplash.com/photo-1622737133649-6238383a6401?w=400" class="node-img">
-                    <h4>Node #${i}</h4>
-                    <p>Cost: $${i * 50} | Daily: $${i * 2}</p>
-                    <div class="progress-bar"><div class="progress" style="width:${Math.random()*100}%"></div></div>
-                    <p style="font-size:0.7rem;">Timer: 23h 12m</p>
-                    <button onclick="alert('Machine #${i} Activated!')">Activate</button>
+                    <h3>Mining Node v${i}</h3>
+                    <p style="color:#94a3b8; margin:5px 0;">Daily Profit: $${i * 2}</p>
+                    <button class="btn-glow" onclick="alert('Node ${i} Started!')">Activate</button>
                 </div>
             `;
         }
 
-        // Firebase Auth & Data
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                onValue(ref(db, 'users/' + user.uid + '/balance'), (snap) => {
-                    document.getElementById('userBalance').innerText = snap.val() ? `$${snap.val()}` : "$0.00";
-                });
-            } else { window.location.href = "login.html"; }
-        });
-
-        document.getElementById('submitDeposit').onclick = () => {
-            const amt = document.getElementById('depositAmount').value;
-            if(amt > 0) push(ref(db, 'deposit_requests/'), {userId: auth.currentUser.uid, amount: amt, status: 'pending'}).then(() => alert("Request Sent!"));
-        };
+        // Live Notification Toast
+        setInterval(() => {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }, 15000);
 
         document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => location.href = "login.html");
     </script>
