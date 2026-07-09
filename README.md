@@ -2,64 +2,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PAK TRADE | FINAL TERMINAL</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <title>Pak Trade | Professional Dashboard</title>
     <style>
-        body { background: #020617; color: white; font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #0a0e14; color: #ffffff; display: flex; min-height: 100vh; }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 250px; background: #111827; padding: 20px; border-right: 1px solid #1f2937; }
+        .logo { font-size: 1.8rem; font-weight: bold; color: #3b82f6; margin-bottom: 30px; }
+        .sidebar li { padding: 15px; cursor: pointer; list-style: none; border-bottom: 1px solid #1f2937; transition: 0.3s; }
+        .sidebar li:hover { color: #3b82f6; }
+
+        /* Main Content */
+        .main-content { flex: 1; padding: 40px; }
+        .card { background: #111827; padding: 20px; border-radius: 10px; border: 1px solid #374151; margin-bottom: 20px; }
+        
+        /* Stats Styling */
+        .stats-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
+        .stats-cards p { font-size: 1.5rem; font-weight: bold; color: #3b82f6; margin-top: 10px; }
+        
+        /* Form Styling */
+        input { padding: 12px; width: 250px; background: #0a0e14; border: 1px solid #374151; color: white; border-radius: 5px; }
+        button { padding: 12px 25px; background: #3b82f6; border: none; color: white; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        
+        /* Responsive Fix */
+        @media (max-width: 768px) { body { flex-direction: column; } .sidebar { width: 100%; } }
     </style>
 </head>
-<body class="pb-12">
-    <main class="max-w-5xl mx-auto p-6">
-        <!-- Header -->
-        <header class="flex justify-between items-center mb-10">
-            <h1 class="text-3xl font-black text-blue-500">PAK TRADE</h1>
-            <div class="glass px-4 py-2 rounded-full text-xs font-bold text-green-500">● SYSTEM ONLINE</div>
-        </header>
+<body>
 
-        <!-- Stats -->
-        <section class="glass p-8 rounded-[2rem] mb-10 text-center">
-            <p class="text-slate-400 text-xs uppercase tracking-widest">Total Asset Value</p>
-            <h2 class="text-5xl font-black mt-2">0.000000 <span class="text-lg font-medium text-slate-500">PKR</span></h2>
-        </section>
+    <div class="sidebar">
+        <div class="logo">Pak Trade</div>
+        <ul>
+            <li>Dashboard</li>
+            <li>Market Data</li>
+            <li>Settings</li>
+            <li id="logoutBtn" style="color: #ef4444;">Logout</li>
+        </ul>
+    </div>
 
-        <!-- 20+ Nodes -->
-        <h3 class="text-xl font-bold mb-6">Cloud Mining Infrastructure</h3>
-        <div id="nodeGrid" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
-
-        <!-- Payment Methods -->
-        <section class="mt-16">
-            <h3 class="text-xl font-bold mb-6">Secure Deposit Methods</h3>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="glass p-6 rounded-[2rem] border border-green-500/20">
-                    <h4 class="font-bold">EasyPaisa</h4>
-                    <p class="text-sm text-slate-400">0337-9827882</p>
-                </div>
-                <div class="glass p-6 rounded-[2rem] border border-red-500/20">
-                    <h4 class="font-bold">JazzCash</h4>
-                    <p class="text-sm text-slate-400">0370-5519562</p>
-                </div>
-                <div class="glass p-6 rounded-[2rem] border-blue-400/20">
-                    <h4 class="font-bold">SadaPay</h4>
-                    <p class="text-sm text-slate-400">Nazim.pro</p>
-                </div>
+    <div class="main-content">
+        <div class="card" style="border: 1px solid #3b82f6;">
+            <h3>How Pak Trade Works</h3>
+            <div style="display: flex; justify-content: space-around; margin-top: 15px; text-align: center;">
+                <div>💳<p style="font-size: 0.7rem; color:white;">1. Deposit</p></div>
+                <div>📈<p style="font-size: 0.7rem; color:white;">2. Trade</p></div>
+                <div>💰<p style="font-size: 0.7rem; color:white;">3. Earn</p></div>
+                <div>🏦<p style="font-size: 0.7rem; color:white;">4. Withdraw</p></div>
             </div>
-        </section>
-    </main>
+        </div>
 
-    <script>
-        const grid = document.getElementById("nodeGrid");
-        for(let i=1; i<=20; i++) {
-            grid.innerHTML += `
-            <div class="glass p-4 rounded-2xl hover:border-blue-500 transition-all text-center">
-                <i data-lucide="cpu" class="mx-auto mb-2 text-blue-500"></i>
-                <p class="text-[10px] font-bold">NODE ${i}</p>
-                <p class="text-[10px] text-slate-400">Profit: ${i * 50} PKR</p>
-                <button class="w-full mt-3 py-1.5 bg-blue-600 rounded-lg text-[10px] font-bold hover:bg-blue-500">BUY</button>
-            </div>`;
-        }
-        lucide.createIcons();
+        <div class="stats-cards">
+            <div class="card"><h3>Total Balance</h3><p id="userBalance">$0.00</p></div>
+            <div class="card"><h3>Active Trades</h3><p style="color:#10b981;">0</p></div>
+            <div class="card"><h3>Security Status</h3><p style="font-size: 1rem; margin-top: 15px;">SSL Encrypted</p></div>
+        </div>
+
+        <div class="card">
+            <h3>Add Funds to Account</h3>
+            <div style="margin-top: 15px;">
+                <input type="number" id="depositAmount" placeholder="Amount (USD)">
+                <button id="submitDeposit">Submit Request</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+        // Apna Firebase Config yahan paste karein
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqtvNJW_HNv4H2EAzeAhNL-tiUjX1huEg",
+            authDomain: "trade51-f64d5.firebaseapp.com",
+            databaseURL: "https://trade51-f64d5-default-rtdb.firebaseio.com",
+            projectId: "trade51-f64d5",
+            storageBucket: "trade51-f64d5.firebasestorage.app",
+            messagingSenderId: "38759095579",
+            appId: "1:38759095579:web:013d72ab4b5183f99347be"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // User Status Check
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                onValue(ref(db, 'users/' + user.uid + '/balance'), (snap) => {
+                    document.getElementById('userBalance').innerText = snap.val() ? `$${snap.val()}` : "$0.00";
+                });
+            } else { window.location.href = "login.html"; }
+        });
+
+        // Deposit Logic
+        document.getElementById('submitDeposit').onclick = () => {
+            const amt = document.getElementById('depositAmount').value;
+            if(amt > 0) {
+                push(ref(db, 'deposit_requests/'), { userId: auth.currentUser.uid, amount: amt, status: 'pending' })
+                .then(() => alert("Request sent successfully, sweetie!"));
+            }
+        };
+
+        // Logout Logic
+        document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => location.href = "login.html");
     </script>
 </body>
 </html>
