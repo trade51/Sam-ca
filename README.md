@@ -128,7 +128,7 @@
             transform: translateY(-2px);
         }
 
-        /* Navigation Button for Demo */
+        /* Navigation Button */
         .toggle-btn {
             background: transparent;
             border: 1px solid #d4af37;
@@ -193,6 +193,10 @@
             font-weight: bold;
         }
     </style>
+
+    <!-- Firebase v9 Web Compatibility Scripts (Required for Single-Page HTML Deployment) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -240,17 +244,17 @@
                 <input type="file" id="photo" accept="image/*" required>
             </div>
 
-            <button type="submit" class="submit-btn">Submit Application</button>
+            <button type="submit" class="submit-btn" id="submitBtn">Submit Application</button>
         </form>
 
-        <button class="toggle-btn" onclick="toggleView('admin')">View Admin Panel (Demo)</button>
+        <button class="toggle-btn" onclick="toggleView('admin')">View Admin Panel</button>
     </div>
 
     <!-- Admin Panel Container -->
     <div class="container hidden" id="adminSection">
         <div class="logo-area">
             <h2>SAM EVENTS - ADMIN PANEL</h2>
-            <p>Review Registered Talent</p>
+            <p>Review Registered Talent (Realtime)</p>
         </div>
 
         <h3>Received Applications</h3>
@@ -267,7 +271,7 @@
                     </tr>
                 </thead>
                 <tbody id="adminTableBody">
-                    <!-- Data will load here dynamically -->
+                    <tr><td colspan="5" style="text-align: center; color: #888;">Connecting to Firebase...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -276,9 +280,27 @@
     </div>
 
     <script>
-        // Form submission handling
+        // 1. Initialize Firebase using the Compat Library
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqtvNJW_HNv4H2EAzeAhNL-tiUjX1huEg",
+            authDomain: "trade51-f64d5.firebaseapp.com",
+            databaseURL: "https://trade51-f64d5-default-rtdb.firebaseio.com",
+            projectId: "trade51-f64d5",
+            storageBucket: "trade51-f64d5.firebasestorage.app",
+            messagingSenderId: "38759095579",
+            appId: "1:38759095579:web:013d72ab4b5183f99347be"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // 2. Form Submission to Firebase Realtime Database
         document.getElementById('castingForm').addEventListener('submit', function(e) {
             e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerText = "Submitting...";
+            submitBtn.disabled = true;
 
             const fullName = document.getElementById('fullName').value;
             const age = document.getElementById('age').value;
@@ -286,27 +308,29 @@
             const phone = document.getElementById('phone').value;
             const photoInput = document.getElementById('photo');
 
-            // Handle Photo Preview with FileReader
             const file = photoInput.files[0];
             const reader = new FileReader();
 
             reader.onloadend = function() {
-                const application = {
+                // Generate a unique push key under 'auditions' node
+                const newAuditionRef = database.ref('auditions').push();
+                
+                newAuditionRef.set({
                     name: fullName,
                     age: age,
                     category: category,
                     phone: phone,
-                    photo: reader.result // Base64 image representation
-                };
-
-                // Save to localStorage
-                let submissions = JSON.parse(localStorage.getItem('submissions')) || [];
-                submissions.push(application);
-                localStorage.setItem('submissions', JSON.stringify(submissions));
-
-                alert('Application submitted successfully, sweetie! Now check the Admin Panel.');
-                document.getElementById('castingForm').reset();
-                loadSubmissions();
+                    photo: reader.result // Photo base64 data url
+                }).then(() => {
+                    alert('Application successfully sent to Realtime Database, sweetie!');
+                    document.getElementById('castingForm').reset();
+                    submitBtn.innerText = "Submit Application";
+                    submitBtn.disabled = false;
+                }).catch((error) => {
+                    alert('Error writing to database: ' + error.message);
+                    submitBtn.innerText = "Submit Application";
+                    submitBtn.disabled = false;
+                });
             }
 
             if (file) {
@@ -314,39 +338,47 @@
             }
         });
 
-        // Toggle between User Form and Admin Panel
+        // 3. Toggle View Function
         function toggleView(view) {
             if (view === 'admin') {
                 document.getElementById('formSection').classList.add('hidden');
                 document.getElementById('adminSection').classList.remove('hidden');
-                loadSubmissions();
+                listenToSubmissions();
             } else {
                 document.getElementById('adminSection').classList.add('hidden');
                 document.getElementById('formSection').classList.remove('hidden');
             }
         }
 
-        // Load data from localStorage to Admin Table
-        function loadSubmissions() {
+        // 4. Listen to Realtime Submissions from Firebase
+        function listenToSubmissions() {
             const tableBody = document.getElementById('adminTableBody');
-            tableBody.innerHTML = '';
-            const submissions = JSON.parse(localStorage.getItem('submissions')) || [];
+            
+            // Listen for any database changes live!
+            database.ref('auditions').on('value', (snapshot) => {
+                tableBody.innerHTML = '';
+                const data = snapshot.val();
 
-            if (submissions.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #888;">No applications received yet.</td></tr>`;
-                return;
-            }
+                if (!data) {
+                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #888;">No applications found in Firebase.</td></tr>`;
+                    return;
+                }
 
-            submissions.forEach(data => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><img src="${data.photo}" class="preview-img" alt="User Photo"></td>
-                    <td>${data.name}</td>
-                    <td>${data.age}</td>
-                    <td><span class="badge">${data.category}</span></td>
-                    <td><a href="https://wa.me/${data.phone}" target="_blank" style="color: #d4af37; text-decoration: none;">${data.phone}</a></td>
-                `;
-                tableBody.appendChild(row);
+                // Render each node dynamically
+                Object.keys(data).forEach(key => {
+                    const submission = data[key];
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><img src="${submission.photo}" class="preview-img" alt="User Photo"></td>
+                        <td>${submission.name}</td>
+                        <td>${submission.age}</td>
+                        <td><span class="badge">${submission.category}</span></td>
+                        <td><a href="https://wa.me/${submission.phone}" target="_blank" style="color: #d4af37; text-decoration: none;">${submission.phone}</a></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }, (error) => {
+                tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Permission Denied. Set rules to public!</td></tr>`;
             });
         }
     </script>
