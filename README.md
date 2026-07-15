@@ -34,9 +34,12 @@
             position: relative;
         }
 
+        /* Eagle Eye Trigger Element */
         .logo-area {
             text-align: center;
             margin-bottom: 25px;
+            cursor: pointer; /* Change cursor to pointer for double click */
+            user-select: none;
         }
 
         .logo-area h2 {
@@ -128,7 +131,7 @@
             transform: translateY(-2px);
         }
 
-        /* Navigation Button */
+        /* Toggle Button */
         .toggle-btn {
             background: transparent;
             border: 1px solid #d4af37;
@@ -145,6 +148,23 @@
         .toggle-btn:hover {
             background: #d4af37;
             color: #000000;
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-controls input, .filter-controls select {
+            padding: 8px;
+            background: #2a2a2a;
+            border: 1px solid #444444;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 14px;
+            flex: 1;
         }
 
         /* Admin Table View */
@@ -192,17 +212,30 @@
             text-transform: capitalize;
             font-weight: bold;
         }
+
+        .whatsapp-link {
+            background: #25D366;
+            color: white;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .whatsapp-link:hover {
+            background: #1ebd59;
+        }
     </style>
 
-    <!-- Firebase v9 Web Compatibility Scripts (Required for Single-Page HTML Deployment) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
-    <!-- Main Registration Container -->
     <div class="container" id="formSection">
-        <div class="logo-area">
+        <div class="logo-area" ondblclick="triggerEagleEye()">
             <h2>SAM EVENTS & PRODUCTION</h2>
             <p>Committed With Quality</p>
         </div>
@@ -246,18 +279,27 @@
 
             <button type="submit" class="submit-btn" id="submitBtn">Submit Application</button>
         </form>
-
-        <button class="toggle-btn" onclick="toggleView('admin')">View Admin Panel</button>
     </div>
 
-    <!-- Admin Panel Container -->
     <div class="container hidden" id="adminSection">
         <div class="logo-area">
-            <h2>SAM EVENTS - ADMIN PANEL</h2>
-            <p>Review Registered Talent (Realtime)</p>
+            <h2>SAM EVENTS - EAGLE EYE</h2>
+            <p>Review Registered Talent (Realtime Database)</p>
         </div>
 
         <h3>Received Applications</h3>
+
+        <div class="filter-controls">
+            <input type="text" id="searchName" placeholder="Search by name..." oninput="filterData()">
+            <select id="filterCategory" onchange="filterData()">
+                <option value="all">All Categories</option>
+                <option value="girls">Girls</option>
+                <option value="boys">Boys</option>
+                <option value="children">Children</option>
+                <option value="uncles">Uncles</option>
+                <option value="aunties">Aunties</option>
+            </select>
+        </div>
         
         <div class="table-wrapper">
             <table>
@@ -267,7 +309,7 @@
                         <th>Name</th>
                         <th>Age</th>
                         <th>Category</th>
-                        <th>WhatsApp</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="adminTableBody">
@@ -280,7 +322,7 @@
     </div>
 
     <script>
-        // 1. Initialize Firebase using the Compat Library
+        // 1. Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBqtvNJW_HNv4H2EAzeAhNL-tiUjX1huEg",
             authDomain: "trade51-f64d5.firebaseapp.com",
@@ -293,8 +335,9 @@
 
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        let allSubmissions = []; // Global variable to hold fetched firebase data
 
-        // 2. Form Submission to Firebase Realtime Database
+        // 2. Form Submission to Firebase
         document.getElementById('castingForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -312,7 +355,6 @@
             const reader = new FileReader();
 
             reader.onloadend = function() {
-                // Generate a unique push key under 'auditions' node
                 const newAuditionRef = database.ref('auditions').push();
                 
                 newAuditionRef.set({
@@ -320,14 +362,14 @@
                     age: age,
                     category: category,
                     phone: phone,
-                    photo: reader.result // Photo base64 data url
+                    photo: reader.result 
                 }).then(() => {
-                    alert('Application successfully sent to Realtime Database, sweetie!');
+                    alert('Application successfully sent, sweetie!');
                     document.getElementById('castingForm').reset();
                     submitBtn.innerText = "Submit Application";
                     submitBtn.disabled = false;
                 }).catch((error) => {
-                    alert('Error writing to database: ' + error.message);
+                    alert('Database Error: ' + error.message);
                     submitBtn.innerText = "Submit Application";
                     submitBtn.disabled = false;
                 });
@@ -338,7 +380,17 @@
             }
         });
 
-        // 3. Toggle View Function
+        // 3. Eagle Eye Trigger via Double-Click
+        function triggerEagleEye() {
+            const password = prompt("Eagle Eye Verification Key enters karein, sweetie:");
+            if (password === "eagleeye51") {
+                toggleView('admin');
+            } else if (password !== null) {
+                alert("Wrong Key! Access Denied.");
+            }
+        }
+
+        // 4. Toggle Views
         function toggleView(view) {
             if (view === 'admin') {
                 document.getElementById('formSection').classList.add('hidden');
@@ -350,36 +402,63 @@
             }
         }
 
-        // 4. Listen to Realtime Submissions from Firebase
+        // 5. Read Firebase Data
         function listenToSubmissions() {
-            const tableBody = document.getElementById('adminTableBody');
-            
-            // Listen for any database changes live!
             database.ref('auditions').on('value', (snapshot) => {
-                tableBody.innerHTML = '';
                 const data = snapshot.val();
+                allSubmissions = []; // Reset local array
 
-                if (!data) {
-                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #888;">No applications found in Firebase.</td></tr>`;
-                    return;
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        allSubmissions.push(data[key]);
+                    });
                 }
-
-                // Render each node dynamically
-                Object.keys(data).forEach(key => {
-                    const submission = data[key];
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td><img src="${submission.photo}" class="preview-img" alt="User Photo"></td>
-                        <td>${submission.name}</td>
-                        <td>${submission.age}</td>
-                        <td><span class="badge">${submission.category}</span></td>
-                        <td><a href="https://wa.me/${submission.phone}" target="_blank" style="color: #d4af37; text-decoration: none;">${submission.phone}</a></td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+                renderTable(allSubmissions);
             }, (error) => {
-                tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Permission Denied. Set rules to public!</td></tr>`;
+                document.getElementById('adminTableBody').innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Permission Denied. Set rules to public!</td></tr>`;
             });
+        }
+
+        // 6. Render Table data with Dynamic Whatsapp shortlisting text
+        function renderTable(dataArray) {
+            const tableBody = document.getElementById('adminTableBody');
+            tableBody.innerHTML = '';
+
+            if (dataArray.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #888;">No submissions match the filters.</td></tr>`;
+                return;
+            }
+
+            dataArray.forEach(submission => {
+                const row = document.createElement('tr');
+                
+                // Formatting custom Whatsapp shortlisting message
+                const msg = encodeURIComponent(`Hi ${submission.name}! Hope you are doing well. This is SAM Events & Production. We checked your casting profile and would love to invite you for auditions!`);
+                const waLink = `https://wa.me/${submission.phone}?text=${msg}`;
+
+                row.innerHTML = `
+                    <td><img src="${submission.photo}" class="preview-img" alt="Photo"></td>
+                    <td>${submission.name}</td>
+                    <td>${submission.age}</td>
+                    <td><span class="badge">${submission.category}</span></td>
+                    <td><a href="${waLink}" target="_blank" class="whatsapp-link">WhatsApp</a></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // 7. Filtering and Searching logic
+        function filterData() {
+            const searchValue = document.getElementById('searchName').value.toLowerCase();
+            const categoryValue = document.getElementById('filterCategory').value;
+
+            const filtered = allSubmissions.filter(item => {
+                const matchesName = item.name.toLowerCase().includes(searchValue);
+                const matchesCategory = (categoryValue === 'all') || (item.category === categoryValue);
+                return matchesName && matchesCategory;
+            });
+
+            renderTable(filtered);
         }
     </script>
 </body>
